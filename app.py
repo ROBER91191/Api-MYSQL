@@ -67,9 +67,16 @@ def userdata(id):
     #print(cookies)
     valor_usucookie = cookies.get('usu')
     cookid = 0
+
     if valor_usucookie != None:
+        # Encontrar la posición del guion bajo
         cookid_index = valor_usucookie.index('_')
-        cookid = cookid_index[:cookid_index]
+
+        # EXTRAER el ID desde el principio hasta el "_"
+        cookid_str  = valor_usucookie[:cookid_index] # ← aquí estaba el error: antes usabas el índice como si fuera string
+
+        cookid = int(cookid_str)  # convertir a entero
+
     if int(id) == int(cookid):
         #mostrar datos
         results = db.user_datalogin(id)
@@ -102,12 +109,22 @@ def login():
                 ###adding code
                 loged_user = db.check_userbymail(val_email)
                 # comprobar coincidencia de passw
-                if db.hash_password(val_passw) == loged_user[4]:
+                if db.hash_password(val_passw) == loged_user[6]:
                     # OK
                     db.user_addlogin(int(loged_user[0]))
-                    cookie_str = str(loged_user[0]) + "_" + loged_user[1][:1] + loged_user[2][:1]
+
+                    # Función auxiliar para evitar error con None
+                    def safe_initial(value):
+                        return value[:1] if value else "_" # si el campo es None o vacío, devuelve "_"
+                    
+                    # Creamos la cookie con el ID del usuario y las iniciales del nombre y apellido
+                    # Ejemplo: "14_RS" si el usuario tiene ID 14, nombre "Roberto", apellido "Serpa"
+                    cookie_str = f"{loged_user[0]}_{safe_initial(loged_user[3])}{safe_initial(loged_user[4])}"
+
+                    # Creamos una respuesta con redirección a la vista userdata con el ID
                     resp = make_response(redirect(url_for('userdata',
                                                         id=loged_user[0])))
+                    # Guardamos la cookie "usu", válida por 5 minutos (300 segundos)
                     resp.set_cookie("usu", cookie_str, max_age=60*5)
                     return resp
                 else:

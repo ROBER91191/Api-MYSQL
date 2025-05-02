@@ -50,7 +50,8 @@ def check_userbymail(email):
         return result
     else:
         return None
-print(check_userbymail("pepe@mail.com"))
+    
+# print(check_userbymail("pepe@mail.com"))
 
 #método para encriptar password
 def hash_password(password):
@@ -83,15 +84,13 @@ def user_addlogin(id: int):
 
 
 def user_datalogin(id: int):
-    cursor = connectDB()
-    sql = """SELECT US. FECHA_LOGIN, U.NOMBRE, U.APELLIDO
-    FROM pruebaiwii.user_sessions US
-    INNER JOIN pruebaiwii.users U ON US.ID_USER=U.ID
-    WHERE US.ID_USER=%s"""
+    conn = connectDB()
+    cursor=conn.cursor()
+    sql = "SELECT us.fecha_login, u.nombre, u.apellido FROM user_sessions us INNER JOIN users u ON us.id_user=u.id WHERE us.id_user=%s"
     if not error:
         cursor.execute(sql, id)
         results = cursor.fetchall()
-        disconnectDB()
+        disconnectDB(conn)
     if results:
         results_proc = []
         index = 0
@@ -126,3 +125,7 @@ def user_datalogin(id: int):
 # # Finalizar
 # conexion.commit()
 # conexion.close()
+
+
+# INSTALAR MONGO
+# pip install pymongo dnspython

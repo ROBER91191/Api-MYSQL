@@ -141,6 +141,86 @@ def login():
                                 email=email, passw=passw)
 
 
+@app.route("/userdata/edit", methods=["GET", "POST"])
+def edit_user():
+    cookie = request.cookies.get("usu")
+    if not cookie:
+        return redirect(url_for("login"))
+    
+    try:
+        user_id = int(cookie.split("_")[0])
+    except:
+        return redirect(url_for("login"))
+
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template("edit_user.html", user=user, updated=False, error=False)
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        nueva_pass = request.form.get("passw")
+
+        # Validaciones básicas (puedes usar validate si lo prefieres)
+        if not nombre or not apellido or not nueva_pass:
+            return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Todos los campos son obligatorios.")
+
+        result = db.update_user_data(user_id, nombre, apellido, nueva_pass)
+        user = db.get_user_by_id(user_id)  # refrescar datos por si cambió algo
+
+        if result:
+            return render_template("edit_user.html", user=user, updated=True, error=False)
+        else:
+            return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Error al actualizar los datos.")
+
+
+@app.route("/userdata/all")
+def all_users():
+    cookie = request.cookies.get("usu")
+    if not cookie:
+        return redirect(url_for("login"))
+
+    try:
+        user_id = int(cookie.split("_")[0])
+    except:
+        return redirect(url_for("login"))
+
+    current_user = db.get_user_by_id(user_id)
+    if not current_user:
+        return redirect(url_for("login"))
+
+    user_rol_id = current_user[6]  # id_rol está en índice 6
+    if user_rol_id not in [1, 2]:  # solo super(1) y admin(2)
+        return redirect(url_for("home"))
+
+    filtro_email = request.args.get("email")
+    if filtro_email:
+        users = db.get_users_by_email_filter(filtro_email)
+    else:
+        users = db.get_all_users()
+
+    return render_template("all_users.html", users=users, current_user=current_user)
+
+
+@app.route("/userdata/toggle/<int:id>/<int:new_status>")
+def toggle_user(id, new_status):
+    cookie = request.cookies.get("usu")
+    if not cookie:
+        return redirect(url_for("login"))
+    try:
+        user_id = int(cookie.split("_")[0])
+    except:
+        return redirect(url_for("login"))
+    current_user = db.get_user_by_id(user_id)
+    if not current_user or current_user[6] != 1:  # solo super
+        return redirect(url_for("home"))
+    db.toggle_user_status(id, new_status)
+    return redirect(url_for("all_users"))
+
+
 #ejecutar el archivo principal
 if __name__ == '__main__':
     app.run()

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mt-3">Listado de Usuarios</h2>
+
+<form method="get" class="mb-3">
+  <input type="text" name="email" placeholder="Filtrar por email" class="form-control w-25 d-inline">
+  <button type="submit" class="btn btn-secondary">Filtrar</button>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Rol</th><th>Habilitado</th><th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user[0] }}</td>
+      <td>{{ user[1] }}</td>
+      <td>{{ user[2] }}</td>
+      <td>{{ user[3] }}</td>
+      <td>{{ user[6] }}</td>
+      <td>{{ 'Sí' if user[7] else 'No' }}</td>
+      <td>
+        {% if current_user[6] == 1 and user[0] != current_user[0] %}
+        <a href="{{ url_for('toggle_user', id=user[0], new_status=(0 if user[7] else 1)) }}"
+           class="btn btn-sm {{ 'btn-danger' if user[7] else 'btn-success' }}">
+           {{ 'Deshabilitar' if user[7] else 'Habilitar' }}
+        </a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

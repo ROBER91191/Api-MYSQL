@@ -107,24 +107,82 @@ def user_datalogin(id: int):
     else:
         return None
     
-# reg_user("Ana", "Larra", "ana2@mail.com", "anapass")
+def get_user_by_id(user_id):
+    conn = connectDB()
+    if not conn:
+        return None
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        return user
+    except Exception as e:
+        print(f"Error al obtener usuario por ID: {e}")
+        return None
+    finally:
+        cursor.close()
+        disconnectDB(conn)
 
-# # Conectar con base de datos
-# conexion = pymysql.connect(host=db_host,
-# user=db_user,
-# passwd=db_password,
-# database=db_name)
-# cursor = conexion.cursor()
+def update_user_data(user_id, nombre, apellido, nueva_password):
+    conn = connectDB()
+    if not conn:
+        return False
+    try:
+        cursor = conn.cursor()
+        hashed = hash_password(nueva_password)
+        sql = """UPDATE users 
+                 SET nombre = %s, apellido = %s, password = %s 
+                 WHERE id = %s"""
+        cursor.execute(sql, (nombre, apellido, hashed, user_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error al actualizar datos del usuario: {e}")
+        return False
+    finally:
+        cursor.close()
+        disconnectDB(conn)
 
-# sql = "SELECT * FROM Usuarios"
-# # Mostrar registros
-# cursor.execute(sql)
-# filas = cursor.fetchall()
-# for fila in filas:
-#     print(fila)
-# # Finalizar
-# conexion.commit()
-# conexion.close()
+def get_all_users():
+    conn = connectDB()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error al obtener usuarios:", e)
+        return []
+    finally:
+        cursor.close()
+        disconnectDB(conn)
+
+def get_users_by_email_filter(email):
+    conn = connectDB()
+    try:
+        cursor = conn.cursor()
+        sql = "SELECT * FROM users WHERE email LIKE %s"
+        cursor.execute(sql, ('%' + email + '%',))
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error al filtrar usuarios:", e)
+        return []
+    finally:
+        cursor.close()
+        disconnectDB(conn)
+
+def toggle_user_status(user_id, new_status):
+    conn = connectDB()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET habilitado = %s WHERE id = %s", (new_status, user_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("Error al cambiar estado del usuario:", e)
+        return False
+    finally:
+        cursor.close()
+        disconnectDB(conn)
 
 
 # INSTALAR MONGO

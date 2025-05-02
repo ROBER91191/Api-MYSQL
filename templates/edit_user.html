@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Editar mis datos</h2>
+
+{% if updated %}
+<div class="alert alert-success">Datos actualizados correctamente ✅</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger">{{ error_msg }}</div>
+{% endif %}
+
+<form method="post">
+  <div class="form-group mt-3">
+    <label>Nombre:</label>
+    <input type="text" name="nombre" value="{{ user[1] }}" required class="form-control">
+  </div>
+  <div class="form-group mt-3">
+    <label>Apellido:</label>
+    <input type="text" name="apellido" value="{{ user[2] }}" required class="form-control">
+  </div>
+  <div class="form-group mt-3">
+    <label>Nueva contraseña:</label>
+    <input type="password" name="passw" required class="form-control">
+  </div>
+  <input type="submit" class="btn btn-dark mt-3" value="Actualizar">
+</form>
+{% endblock %}

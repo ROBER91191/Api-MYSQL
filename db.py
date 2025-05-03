@@ -184,6 +184,33 @@ def toggle_user_status(user_id, new_status):
         cursor.close()
         disconnectDB(conn)
 
+def get_all_cursos():
+    conn = connectDB()
+    sql = "SELECT id, nombre, descripcion, duracion FROM cursos WHERE disponibilidad = TRUE"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+
+def inscribir_usuario_curso(user_id, curso_id):
+    conn = connectDB()
+    sql = "INSERT INTO usuarios_cursos (user_id, curso_id) VALUES (%s, %s)"
+    cursor = conn.cursor()
+    cursor.execute(sql, (user_id, curso_id))
+    conn.commit()
+
+def get_cursos_usuario(user_id):
+    conn = connectDB()
+    sql = """
+        SELECT c.nombre, c.descripcion, c.duracion
+        FROM cursos c
+        JOIN usuarios_cursos uc ON c.id = uc.curso_id
+        WHERE uc.user_id = %s
+    """
+    cursor = conn.cursor()
+    cursor.execute(sql, (user_id,))
+    return cursor.fetchall()
+
 
 # INSTALAR MONGO
 # pip install pymongo dnspython

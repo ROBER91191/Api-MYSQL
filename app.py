@@ -43,7 +43,10 @@ def signup():
                 if new_user:
                     db.user_addlogin(int(new_user[0]))
                     #redirigir a destino y logar
-                    cookie_str = str(new_user[0]) + "_" + new_user[1][:1] +new_user[2][:1]
+                    # id_user = new_user[0]
+                    # nombre = new_user[3][:1]
+                    # apellido = new_user[4][:1]
+                    cookie_str = str(new_user[0]) + "_" + new_user[3][:1] +new_user[4][:1]
                     resp = make_response(redirect(url_for('userdata',
                     id=new_user[0])))
                     resp.set_cookie("usu", cookie_str, max_age=60*5)
@@ -122,8 +125,8 @@ def login():
                     cookie_str = f"{loged_user[0]}_{safe_initial(loged_user[3])}{safe_initial(loged_user[4])}"
 
                     # Creamos una respuesta con redirección a la vista userdata con el ID
-                    resp = make_response(redirect(url_for('userdata',
-                                                        id=loged_user[0])))
+                    resp = make_response(redirect(url_for('mostrar_cursos')))
+
                     # Guardamos la cookie "usu", válida por 5 minutos (300 segundos)
                     resp.set_cookie("usu", cookie_str, max_age=60*5)
                     return resp
@@ -221,6 +224,40 @@ def toggle_user(id, new_status):
     return redirect(url_for("all_users"))
 
 
-#ejecutar el archivo principal
-if __name__ == '__main__':
-    app.run()
+@app.route("/logout")
+def logout():
+    resp = make_response(redirect(url_for("home")))
+    resp.delete_cookie("usu")
+    return resp
+
+# Añado variable is_logged_in a todas las plantillas de forma automática
+@app.context_processor
+def inject_user_cookie():
+    valor_usucookie = request.cookies.get('usu')
+    return dict(is_logged_in=valor_usucookie is not None)
+
+@app.route("/cursos")
+def mostrar_cursos():
+    cursos = db.get_all_cursos()
+    return render_template("cursos.html", cursos=cursos)
+
+@app.route("/cursos/<int:id>/inscribir", methods=["POST"])
+def inscribirse_curso(id):
+    cookie_str = request.cookies.get("usu")
+    if not cookie_str:
+        return redirect(url_for("login"))
+    
+    user_id = int(cookie_str.split("_")[0])
+    db.inscribir_usuario_curso(user_id, id)
+    return redirect(url_for("mis_cursos"))
+
+
+@app.route("/mis-cursos")
+def mis_cursos():
+    cookie_str = request.cookies.get("usu")
+    if not cookie_str:
+        return redirect(url_for("login"))
+    
+    user_id = int(cookie_str.split("_")[0])
+    cursos = db.get_cursos_usuario(user_id)
+    return render_template("mis_cursos.html", cursos=cursos)

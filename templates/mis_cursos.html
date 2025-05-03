@@ -1,0 +1,8 @@
+<h2>Mis Cursos</h2>
+{% for curso in cursos %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+        <h3>{{ curso[0] }}</h3>
+        <p><strong>Duración:</strong> {{ curso[2] }}h</p>
+        <p>{{ curso[1] }}</p>
+    </div>
+{% endfor %}

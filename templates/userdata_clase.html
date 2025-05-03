@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block title %}
+Acceso de usuarios logados
+{% endblock %}
+{% block header %}
+    <h1 class="mx-5">Bienvenido a tus datos de registro</h1>
+{% endblock %}
+{% block content %}
+        <div>
+            {% if rerror %}
+            <div class="alert alert-warning" role="alert">{{rerror_msg}}</div>
+            {% endif %}
+            </div>
+            <div>
+            {% if show_data_aftersend and results %}
+            <table class="table">
+            <thead>
+            <tr>
+            <th scope="col">Logins</th>
+            <th scope="col">Fecha</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in results: %}
+            <tr>
+            <td>{{ item[0] }}</td>
+            <td>{{ item[1] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+            <div class="alert alert-success" role="alert">{{results[0][2]}}
+            {{results[0][3]}} has accedido un total de {{ total }} veces</div>
+            {% endif %}
+        </div>
+{% endblock %}
+{% block footer %}
+{% endblock %}

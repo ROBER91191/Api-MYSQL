@@ -84,15 +84,18 @@ def userdata(id):
         #mostrar datos
         results = db.user_datalogin(id)
         total = len(results)
+
+        cursos = db.get_all_cursos()
+
         if results:
             return render_template("userdata.html", show_data_aftersend =
-            True, rerror=False, results=results, total=total)
+            True, rerror=False, results=results, total=total,cursos=cursos)
         else:
             return render_template("userdata.html", show_data_aftersend =
-            True, rerror = False, rerror_msg = "En este momento no podemos procesar la solicitud, inténtalo de nuevo más tarde")
+            True, rerror = False, rerror_msg = "En este momento no podemos procesar la solicitud, inténtalo de nuevo más tarde", cursos=[])
     else:
         return render_template("userdata.html", show_data_aftersend =
-        True, rerror=False, rerror_msg="Debes estar logado para ver esta sección")
+        True, rerror=False, rerror_msg="Debes estar logado para ver esta sección",cursos=[])
 
 
 @app.route("/login", methods=["GET","POST"])

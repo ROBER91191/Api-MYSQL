@@ -12,27 +12,35 @@
     <div class="alert alert-warning" role="alert">{{rerror_msg}}</div>
     {% endif %}
     </div>
-    <form class="form" method="post" class="mxw-800">
-    <div class="form-group">
-    <label for="nombre" class="form-label">Nombre</label>
-    <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre" required autofocus {% if show_data_aftersend %}
-    value={{nombre}} {% endif %}>
-    </div>
-    <div class="form-group mt-3">
-    <label for="apellido" class="form-label">Apellido</label>
-    <input type="text" name="apellido" id="apellido" class="form-control" placeholder="Apellido" required {% if show_data_aftersend %}
-    value={{apellido}} {% endif %}>
-    </div>
-    <div class="form-group mt-3">
-    <label for="email" class="form-label">Email</label>
-    <input type="email" name="email" id="email" class="form-control" required {% if show_data_aftersend %} value={{email}} {% endif %}>
-    </div>
-    <div class="form-group mt-3 w-50">
-    <label for="passw" class="form-label">Contraseña</label>
-    <input type="password" name="passw" id="passw" class="form-control" required {% if show_data_aftersend %} value={{passw}} {% endif %}>
-    </div>
-    <input type="submit" class="btn btn-dark mt-4" value="Registrar">
+    <form class="form mxw-800" method="post">
+        <div class="form-group">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre" required autofocus
+                   {% if show_data_aftersend %} value="{{ nombre }}" {% endif %}>
+        </div>
+    
+        <div class="form-group mt-3">
+            <label for="apellido" class="form-label">Apellido</label>
+            <input type="text" name="apellido" id="apellido" class="form-control" placeholder="Apellido" required
+                   {% if show_data_aftersend %} value="{{ apellido }}" {% endif %}>
+        </div>
+    
+        <div class="form-group mt-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="Email" required
+                   {% if show_data_aftersend %} value="{{ email }}" {% endif %}>
+        </div>
+    
+        <div class="form-group mt-3 w-50">
+            <label for="passw" class="form-label">Contraseña</label>
+            <input type="password" name="passw" id="passw" class="form-control" placeholder="Contraseña" required
+                   {% if show_data_aftersend %} value="{{ passw }}" {% endif %}>
+        </div>
+    
+        <input type="submit" class="btn btn-dark mt-4" value="Registrar">
     </form>
+    
+</div>
 {% endblock %}
 
 {% block footer %}

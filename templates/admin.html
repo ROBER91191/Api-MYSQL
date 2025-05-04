@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Panel de Administración</h2>
+
+  <!-- AGREGAR USUARIO -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      Agregar Usuario
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('agregar_usuario') }}">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" required>
+        </div>
+        <div class="mb-3">
+          <label for="apellido" class="form-label">Apellido</label>
+          <input type="text" class="form-control" id="apellido" name="apellido" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+          <label for="passw" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="passw" name="passw" required>
+        </div>
+        <div class="mb-3">
+          <label for="role" class="form-label">Rol</label>
+          <select class="form-select" name="role" required>
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+            <option value="super">Super</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success">Crear Usuario</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- AGREGAR CURSO -->
+  <div class="card">
+    <div class="card-header bg-secondary text-white">
+      Agregar Curso
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('agregar_curso') }}">
+        <div class="mb-3">
+          <label for="nombre_curso" class="form-label">Nombre del curso</label>
+          <input type="text" class="form-control" id="nombre_curso" name="nombre" required>
+        </div>
+        <div class="mb-3">
+          <label for="descripcion" class="form-label">Descripción</label>
+          <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="duracion" class="form-label">Duración (horas)</label>
+          <input type="number" class="form-control" id="duracion" name="duracion" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Curso</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

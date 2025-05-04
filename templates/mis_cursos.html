@@ -1,8 +1,25 @@
-<h2>Mis Cursos</h2>
-{% for curso in cursos %}
-    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
-        <h3>{{ curso[0] }}</h3>
-        <p><strong>Duración:</strong> {{ curso[2] }}h</p>
-        <p>{{ curso[1] }}</p>
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Mis Cursos</h2>
+
+  {% if cursos %}
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for curso in cursos %}
+    <div class="col">
+      <div class="card h-100">
+        <img src="https://via.placeholder.com/300x150?text=Curso+{{ curso[0] }}" class="card-img-top" alt="Imagen Curso">
+        <div class="card-body">
+          <h5 class="card-title">{{ curso[1] }}</h5>
+          <p class="card-text">{{ curso[2] }}</p>
+          <p><strong>Duración:</strong> {{ curso[3] }} horas</p>
+        </div>
+      </div>
     </div>
-{% endfor %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">Aún no te has inscrito en ningún curso.</p>
+  {% endif %}
+</div>
+{% endblock %}

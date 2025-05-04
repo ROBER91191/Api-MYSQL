@@ -186,10 +186,15 @@ def toggle_user_status(user_id, new_status):
 
 def get_all_cursos():
     conn = connectDB()
-    sql = "SELECT id, nombre, descripcion, duracion FROM cursos WHERE disponibilidad = TRUE"
     cursor = conn.cursor()
+    sql = "SELECT id, nombre, descripcion, duracion FROM cursos WHERE disponibilidad = TRUE"
     cursor.execute(sql)
-    return cursor.fetchall()
+    rows = cursor.fetchall()
+    cursos = []
+    columns = [col[0] for col in cursor.description]
+    for row in rows:
+        cursos.append(dict(zip(columns, row)))
+    return cursos
 
 
 def inscribir_usuario_curso(user_id, curso_id):
@@ -197,19 +202,113 @@ def inscribir_usuario_curso(user_id, curso_id):
     sql = "INSERT INTO usuarios_cursos (user_id, curso_id) VALUES (%s, %s)"
     cursor = conn.cursor()
     cursor.execute(sql, (user_id, curso_id))
-    conn.commit()
+    disconnectDB(conn)
 
 def get_cursos_usuario(user_id):
     conn = connectDB()
+    cursor = conn.cursor()
     sql = """
-        SELECT c.nombre, c.descripcion, c.duracion
+        SELECT c.id, c.nombre, c.descripcion, c.duracion
         FROM cursos c
         JOIN usuarios_cursos uc ON c.id = uc.curso_id
         WHERE uc.user_id = %s
     """
+    cursor.execute(sql, (user_id))
+    rows = cursor.fetchall()
+
+    cursos = []
+    for row in rows:
+        cursos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'duracion': row[3]
+        })
+
+    return cursos
+
+
+def inscribir_usuario(user_id, curso_id):
+    conn = connectDB()
     cursor = conn.cursor()
-    cursor.execute(sql, (user_id,))
-    return cursor.fetchall()
+
+    # Verificar si ya está inscrito
+    cursor.execute("SELECT id FROM usuarios_cursos WHERE user_id = %s AND curso_id = %s", (user_id, curso_id))
+    if cursor.fetchone():
+        return  # Ya está inscrito
+
+    cursor.execute(
+        "INSERT INTO usuarios_cursos (user_id, curso_id) VALUES (%s, %s)",
+        (user_id, curso_id)
+    )
+    
+    disconnectDB(conn)
+
+
+def get_cursos_ids_usuario(user_id):
+    conn = connectDB()
+    cursor = conn.cursor()
+    cursor.execute("SELECT curso_id FROM usuarios_cursos WHERE user_id = %s", (user_id,))
+    results = cursor.fetchall()
+    return {r[0] for r in results}
+
+
+def get_rol_name_by_id(id_rol):
+    conn = connectDB()
+    cursor = conn.cursor()
+    cursor.execute("SELECT nombre FROM usu_rol WHERE id = %s", (id_rol,))
+    result = cursor.fetchone()
+    return result[0] if result else None
+
+def get_rol_id_by_name(nombre):
+    conn = connectDB()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM usu_rol WHERE nombre = %s", (nombre,))
+    result = cursor.fetchone()
+    return result[0] if result else None
+
+def insert_user(id_rol, nombre, apellido, email, hashed_pw):
+    conn = connectDB()
+    cursor = conn.cursor()
+    sql = """INSERT INTO users (id_rol, nombre, apellido, email, password, fecha_creacion)
+             VALUES (%s, %s, %s, %s, %s, NOW())"""
+    cursor.execute(sql, (id_rol, nombre, apellido, email, hashed_pw))
+    conn.commit()
+
+def insert_curso(nombre, descripcion, duracion):
+    conn = connectDB()
+    cursor = conn.cursor()
+    sql = """INSERT INTO cursos (nombre, descripcion, duracion, disponibilidad)
+             VALUES (%s, %s, %s, TRUE)"""
+    cursor.execute(sql, (nombre, descripcion, duracion))
+    conn.commit()
+
+def get_cursos_ids_by_usuario(usuario_id):
+    conn = connectDB()
+    cursor = conn.cursor()
+    query = "SELECT curso_id FROM usuarios_cursos WHERE user_id = %s"
+    cursor.execute(query, (usuario_id,))
+    resultados = cursor.fetchall()
+    conn.close()
+
+    # fetchall devuelve lista de tuplas, extraemos los ids:
+    return [fila[0] for fila in resultados]
+
+def get_cursos_by_usuario(usuario_id):
+    conn = connectDB()
+    cursor = conn.cursor()
+    
+    sql = """
+        SELECT c.id, c.nombre, c.descripcion, c.duracion
+        FROM cursos c
+        JOIN usuarios_cursos uc ON c.id = uc.curso_id
+        WHERE uc.user_id = %s
+    """
+    
+    cursor.execute(sql, (usuario_id,))
+    cursos = cursor.fetchall()
+    conn.close()
+    return cursos
 
 
 # INSTALAR MONGO

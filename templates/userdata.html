@@ -3,82 +3,7 @@
 <div class="container mt-5">
   <h2 class="mb-4">Plan de Estudios</h2>
 
-  {% macro asignaturas_table(asignaturas) %}
-    <table class="table table-striped table-bordered">
-      <thead class="table-dark">
-        <tr>
-          <th>Código</th>
-          <th>Asignaturas</th>
-          <th>Carácter</th>
-          <th>Créditos</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in asignaturas %}
-        <tr>
-          <td>{{ a.codigo }}</td>
-          <td>{{ a.nombre }}</td>
-          <td>{{ a.caracter }}</td>
-          <td>{{ a.creditos }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endmacro %}
-
-  {% set cursos = [
-    {
-      "nombre": "Primer Curso",
-      "cuatrimestres": [
-        {
-          "nombre": "PRIMER CUATRIMESTRE",
-          "asignaturas": [
-            {"codigo": "S0142500", "nombre": "Álgebra Lineal", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0142501", "nombre": "Estadística I", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0142502", "nombre": "Fundamentos de la Programación I", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0142503", "nombre": "Habilidades Profesionales", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0142504", "nombre": "Matemática Discreta", "caracter": "FB", "creditos": 6},
-          ]
-        },
-        {
-          "nombre": "SEGUNDO CUATRIMESTRE",
-          "asignaturas": [
-            {"codigo": "S0142505", "nombre": "Comportamiento Humano e Integración de la IA", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0142506", "nombre": "Estadística II", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0142507", "nombre": "Estructura y Análisis de Datos", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0142508", "nombre": "Fundamentos de la Programación II", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0142509", "nombre": "Métodos Numéricos y Factorizaciones", "caracter": "OB", "creditos": 6},
-          ]
-        }
-      ]
-    },
-    {
-      "nombre": "Segundo Curso",
-      "cuatrimestres": [
-        {
-          "nombre": "PRIMER CUATRIMESTRE",
-          "asignaturas": [
-            {"codigo": "S0242500", "nombre": "Algoritmos y Estructuras de Datos", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0242501", "nombre": "Arquitectura de Computadores y SO", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0242502", "nombre": "Fundamentos de la Ciencia de Datos", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0242503", "nombre": "Infraestructuras en la Nube", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0242504", "nombre": "Ingeniería Web I", "caracter": "OB", "creditos": 6},
-          ]
-        },
-        {
-          "nombre": "SEGUNDO CUATRIMESTRE",
-          "asignaturas": [
-            {"codigo": "S0242505", "nombre": "Aprendizaje Automático I", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0242506", "nombre": "Diseño y Experiencia de Usuario", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0242507", "nombre": "Ingeniería Web II", "caracter": "OB", "creditos": 6},
-            {"codigo": "S0242508", "nombre": "Inglés para la Computación", "caracter": "FB", "creditos": 6},
-            {"codigo": "S0242509", "nombre": "Visualización de Datos", "caracter": "FB", "creditos": 6},
-          ]
-        }
-      ]
-    }
-  ] %}
-
+  {% if cursos %}
   <div class="accordion" id="accordionCursos">
     {% for curso in cursos %}
     <div class="accordion-item">
@@ -91,14 +16,16 @@
       <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}"
         data-bs-parent="#accordionCursos">
         <div class="accordion-body">
-          {% for cuatri in curso.cuatrimestres %}
-            <h5>{{ cuatri.nombre }}</h5>
-            {{ asignaturas_table(cuatri.asignaturas) }}
-          {% endfor %}
+          <p><strong>Descripción:</strong> {{ curso.descripcion }}</p>
+          <p><strong>Duración:</strong> {{ curso.duracion }} horas</p>
+          <p><strong>Disponible:</strong> {{ 'Sí' if curso.disponible else 'No' }}</p>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <p>No hay cursos disponibles actualmente.</p>
+  {% endif %}
 </div>
 {% endblock %}

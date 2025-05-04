@@ -5,7 +5,7 @@ CREATE TABLE Usu_rol (
 );
 
 -- Tabla de cursos
-CREATE TABLE Cursos (
+CREATE TABLE cursos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,

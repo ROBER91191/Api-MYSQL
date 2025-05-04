@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Agregar Usuario</h2>
+  <form method="POST">
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="apellido" placeholder="Apellido" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <select name="role" required>
+      <option value="user">Usuario</option>
+      <option value="admin">Administrador</option>
+    </select>
+    <button type="submit">Crear Usuario</button>
+  </form>
+</div>
+{% endblock %}

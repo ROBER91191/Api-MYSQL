@@ -9,10 +9,8 @@ Home
 {% block content %}
     <p>Para ver el contenido debes estar registrado</p>
     <p class="lead"></p>
-    <p><a class="btn btn-lg btn-success"
-    href="signup" role="button">Registrarse</a>
-    <p><a class="btn btn-lg btn-success" href="login"
-    role="button">Logarse</a>
+    <a class="btn btn-lg btn-success" href="{{ url_for('signup') }}" role="button">Registrarse</a>
+    <a class="btn btn-lg btn-success" href="{{ url_for('login') }}" role="button">Logarse</a>
     </p>
 {% endblock %}
 

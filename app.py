@@ -1,15 +1,18 @@
-from flask import Flask, render_template, request,make_response, redirect, url_for
-import db, validate
+from flask import Flask, render_template, request,make_response, redirect, url_for, session,flash
+import db, validate,os
+ 
 
 app=Flask(__name__)
+app.secret_key = os.getenv('secret_key')
+
 
 # source .venv/Scripts/activate
 # pip install flask
 # python -m flask run
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template("home.html", active_page="home")
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -85,17 +88,17 @@ def userdata(id):
         results = db.user_datalogin(id)
         total = len(results)
 
-        cursos = db.get_all_cursos()
+        cursos = db.get_cursos_usuario(cookid)
 
         if results:
-            return render_template("userdata.html", show_data_aftersend =
+            return render_template("mis_cursos.html", show_data_aftersend =
             True, rerror=False, results=results, total=total,cursos=cursos)
         else:
-            return render_template("userdata.html", show_data_aftersend =
+            return render_template("mis_cursos.html", show_data_aftersend =
             True, rerror = False, rerror_msg = "En este momento no podemos procesar la solicitud, inténtalo de nuevo más tarde", cursos=[])
     else:
-        return render_template("userdata.html", show_data_aftersend =
-        True, rerror=False, rerror_msg="Debes estar logado para ver esta sección",cursos=[])
+        return render_template("mis_cursos.html", show_data_aftersend =
+        True, rerror=False, rerror_msg="Debes estar logado para ver esta sección", cursos=[])
 
 
 @app.route("/login", methods=["GET","POST"])
@@ -118,6 +121,9 @@ def login():
                 if db.hash_password(val_passw) == loged_user[6]:
                     # OK
                     db.user_addlogin(int(loged_user[0]))
+
+                    # Recuperar ID del rol (suponemos que está en loged_user[1])
+                    session['role'] = db.get_rol_name_by_id(loged_user[1])
 
                     # Función auxiliar para evitar error con None
                     def safe_initial(value):
@@ -229,9 +235,15 @@ def toggle_user(id, new_status):
 
 @app.route("/logout")
 def logout():
-    resp = make_response(redirect(url_for("home")))
-    resp.delete_cookie("usu")
+    # Elimina cualquier dato de sesión o cookie
+    session.clear()
+
+    # Elimina cookie personalizada si la estás usando
+    resp = make_response(render_template("home.html"))
+    resp.set_cookie("usu", "", expires=0)
+
     return resp
+
 
 # Añado variable is_logged_in a todas las plantillas de forma automática
 @app.context_processor
@@ -241,26 +253,95 @@ def inject_user_cookie():
 
 @app.route("/cursos")
 def mostrar_cursos():
+    usuario_id = get_usuario_id_desde_cookie()
     cursos = db.get_all_cursos()
-    return render_template("cursos.html", cursos=cursos)
+    cursos_inscritos = db.get_cursos_ids_by_usuario(usuario_id)
+    return render_template("cursos.html", cursos=cursos, cursos_inscritos=cursos_inscritos)
 
-@app.route("/cursos/<int:id>/inscribir", methods=["POST"])
-def inscribirse_curso(id):
-    cookie_str = request.cookies.get("usu")
-    if not cookie_str:
+
+@app.route("/inscribirse/<int:curso_id>", methods=["POST"])
+def inscribirse(curso_id):
+    cookie = request.cookies.get("usu")
+
+    if not cookie:
         return redirect(url_for("login"))
-    
-    user_id = int(cookie_str.split("_")[0])
-    db.inscribir_usuario_curso(user_id, id)
-    return redirect(url_for("mis_cursos"))
+
+    user_id = int(cookie.split("_")[0])
+
+    db.inscribir_usuario_curso(user_id, curso_id)  # esta función hay que definirla abajo 👇
+
+    return redirect(url_for("mostrar_cursos", mensaje="inscrito"))
 
 
-@app.route("/mis-cursos")
+@app.route("/mis_cursos")
 def mis_cursos():
-    cookie_str = request.cookies.get("usu")
-    if not cookie_str:
-        return redirect(url_for("login"))
-    
-    user_id = int(cookie_str.split("_")[0])
-    cursos = db.get_cursos_usuario(user_id)
-    return render_template("mis_cursos.html", cursos=cursos)
+    usuario_id = get_usuario_id_desde_cookie()
+    cursos = db.get_cursos_by_usuario(usuario_id)
+    return render_template("mis_cursos.html", cursos=cursos, active_page="mis_cursos")
+
+
+
+@app.route("/admin", methods=["GET"])
+def admin():
+    if session.get("role") not in ["admin", "super"]:
+        flash("No tienes permisos para acceder al panel de administración.", "danger")
+        return redirect(url_for("mostrar_cursos"))
+    return render_template("admin.html", active_page="admin")
+
+
+@app.route("/agregar_usuario", methods=["POST"])
+def agregar_usuario():
+    if session.get("role") not in ["admin", "super"]:
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for("mostrar_cursos"))
+
+    nombre = request.form.get("nombre")
+    apellido = request.form.get("apellido")
+    email = request.form.get("email")
+    password = request.form.get("passw")
+    role = request.form.get("role")
+
+    # 👇 Mapea role a ID en tu tabla roles
+    role_map = {"user": 3, "admin": 2, "super": 1}
+    id_rol = role_map.get(role)
+
+    if not id_rol:
+        flash("Rol inválido.", "warning")
+        return redirect(url_for("admin"))
+
+    if db.check_userbymail(email):
+        flash("Ya existe un usuario con ese correo.", "warning")
+        return redirect(url_for("admin"))
+
+    hashed = db.hash_password(password)
+    db.insert_user(nombre, apellido, email, hashed, id_rol)
+    flash("Usuario creado con éxito ✅", "success")
+    return redirect(url_for("admin"))
+
+
+@app.route("/agregar_curso", methods=["POST"])
+def agregar_curso():
+    if session.get("role") not in ["admin", "super"]:
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for("mostrar_cursos"))
+
+    nombre = request.form.get("nombre")
+    descripcion = request.form.get("descripcion")
+    duracion = request.form.get("duracion")
+
+    db.insert_curso(nombre, descripcion, duracion)
+    flash("Curso agregado con éxito ✅", "success")
+    return redirect(url_for("admin"))
+
+
+def get_usuario_id_desde_cookie():
+    from flask import request
+    usu_cookie = request.cookies.get("usu")
+    if usu_cookie:
+        try:
+            # Se espera un formato tipo "14_RS" → ID_nombreInicialApellidoInicial
+            usuario_id = int(usu_cookie.split("_")[0])
+            return usuario_id
+        except (IndexError, ValueError):
+            return None
+    return None

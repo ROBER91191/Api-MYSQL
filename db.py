@@ -267,12 +267,12 @@ def get_rol_id_by_name(nombre):
     result = cursor.fetchone()
     return result[0] if result else None
 
-def insert_user(id_rol, nombre, apellido, email, hashed_pw):
+def insert_user(nombre, apellido, email, hashed, id_rol):
     conn = connectDB()
     cursor = conn.cursor()
     sql = """INSERT INTO users (id_rol, nombre, apellido, email, password, fecha_creacion)
              VALUES (%s, %s, %s, %s, %s, NOW())"""
-    cursor.execute(sql, (id_rol, nombre, apellido, email, hashed_pw))
+    cursor.execute(sql, (id_rol, nombre, apellido, email, hashed))
     conn.commit()
 
 def insert_curso(nombre, descripcion, duracion):

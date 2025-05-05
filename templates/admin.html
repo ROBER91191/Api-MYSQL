@@ -31,7 +31,9 @@
           <select class="form-select" name="role" required>
             <option value="user">Usuario</option>
             <option value="admin">Administrador</option>
+            {% if session.get('role') in ['super'] %}
             <option value="super">Super</option>
+            {% endif %}
           </select>
         </div>
         <button type="submit" class="btn btn-success">Crear Usuario</button>

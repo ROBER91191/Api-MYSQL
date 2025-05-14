@@ -49,6 +49,8 @@ CREATE TABLE usuarios_cursos (
     FOREIGN KEY (curso_id) REFERENCES cursos(id)
 );
 
+ALTER TABLE cursos ADD COLUMN imagen_url TEXT;
+
 
 INSERT INTO cursos (nombre, descripcion, duracion, disponibilidad) VALUES
 ('Python desde Cero', 'Curso para aprender los fundamentos de Python. Recomendado para principiantes.', 40, TRUE),

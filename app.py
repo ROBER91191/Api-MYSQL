@@ -1,9 +1,23 @@
-from flask import Flask, render_template, request,make_response, redirect, url_for, session,flash
-import db, validate,os
- 
+from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
+from flask_sqlalchemy import SQLAlchemy
+from models import db as orm_db
+import db  # tu lógica de negocio / servicios
+import os
+from dotenv import load_dotenv
+import validate  # tu módulo de validaciones
+import uuid
+from werkzeug.utils import secure_filename
 
-app=Flask(__name__)
-app.secret_key = os.getenv('secret_key')
+load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'clave_por_defecto')  # ✅ asegúrate de tener esto en tu .env
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mysql+pymysql://usuario:clave@localhost/mydb')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializar ORM
+orm_db.init_app(app)
 
 
 # source .venv/Scripts/activate
@@ -44,14 +58,14 @@ def signup():
                 new_user = db.check_userbymail(val_email)
 
                 if new_user:
-                    db.user_addlogin(int(new_user[0]))
+                    db.user_addlogin(int(new_user.id))
                     #redirigir a destino y logar
                     # id_user = new_user[0]
                     # nombre = new_user[3][:1]
                     # apellido = new_user[4][:1]
-                    cookie_str = str(new_user[0]) + "_" + new_user[3][:1] +new_user[4][:1]
+                    cookie_str = str(new_user.id) + "_" + new_user.nombre +new_user.apellido
                     resp = make_response(redirect(url_for('userdata',
-                    id=new_user[0])))
+                    id=new_user.id)))
                     resp.set_cookie("usu", cookie_str, max_age=60*5)
                     #60*60*24
                     return resp
@@ -118,12 +132,12 @@ def login():
                 ###adding code
                 loged_user = db.check_userbymail(val_email)
                 # comprobar coincidencia de passw
-                if db.hash_password(val_passw) == loged_user[6]:
+                if db.hash_password(val_passw) == loged_user.password:
                     # OK
-                    db.user_addlogin(int(loged_user[0]))
+                    db.user_addlogin(int(loged_user.id))
 
                     # Recuperar ID del rol (suponemos que está en loged_user[1])
-                    session['role'] = db.get_rol_name_by_id(loged_user[1])
+                    session['role'] = db.get_rol_name_by_id(loged_user.id_rol)
 
                     # Función auxiliar para evitar error con None
                     def safe_initial(value):
@@ -131,7 +145,7 @@ def login():
                     
                     # Creamos la cookie con el ID del usuario y las iniciales del nombre y apellido
                     # Ejemplo: "14_RS" si el usuario tiene ID 14, nombre "Roberto", apellido "Serpa"
-                    cookie_str = f"{loged_user[0]}_{safe_initial(loged_user[3])}{safe_initial(loged_user[4])}"
+                    cookie_str = f"{loged_user.id}_{safe_initial(loged_user.nombre)}{safe_initial(loged_user.apellido)}"
 
                     # Creamos una respuesta con redirección a la vista userdata con el ID
                     resp = make_response(redirect(url_for('mostrar_cursos')))
@@ -251,9 +265,10 @@ def inject_user_cookie():
     valor_usucookie = request.cookies.get('usu')
     return dict(is_logged_in=valor_usucookie is not None)
 
+
 @app.route("/cursos")
 def mostrar_cursos():
-    usuario_id = get_usuario_id_desde_cookie()
+    usuario_id = db.get_usuario_id_desde_cookie()
     cursos = db.get_all_cursos()
     cursos_inscritos = db.get_cursos_ids_by_usuario(usuario_id)
     return render_template("cursos.html", cursos=cursos, cursos_inscritos=cursos_inscritos)
@@ -275,18 +290,21 @@ def inscribirse(curso_id):
 
 @app.route("/mis_cursos")
 def mis_cursos():
-    usuario_id = get_usuario_id_desde_cookie()
+    usuario_id = db.get_usuario_id_desde_cookie()
     cursos = db.get_cursos_by_usuario(usuario_id)
     return render_template("mis_cursos.html", cursos=cursos, active_page="mis_cursos")
 
 
-
 @app.route("/admin", methods=["GET"])
 def admin():
-    if session.get("role") not in ["admin", "super"]:
-        flash("No tienes permisos para acceder al panel de administración.", "danger")
+    if session.get("role") not in ["admin","super"]:
+        flash("Acceso denegado", "danger")
         return redirect(url_for("mostrar_cursos"))
-    return render_template("admin.html", active_page="admin")
+
+    usuarios = db.get_all_usuarios_with_roles()
+    cursos = db.get_all_cursos()
+    return render_template("admin.html", usuarios=usuarios, cursos=cursos, active_page="admin")
+
 
 
 @app.route("/agregar_usuario", methods=["POST"])
@@ -328,20 +346,50 @@ def agregar_curso():
     nombre = request.form.get("nombre")
     descripcion = request.form.get("descripcion")
     duracion = request.form.get("duracion")
+    imagen = request.files.get("imagen")
 
-    db.insert_curso(nombre, descripcion, duracion)
+    imagen_url = None
+    if imagen and imagen.filename != '':
+        # filename = secure_filename(f"{uuid.uuid4().hex}_{imagen.filename}")
+        filename = secure_filename(f"{imagen.filename}")
+        ruta = os.path.join("static/uploads", filename)
+        imagen.save(ruta)
+        imagen_url = f"/static/uploads/{filename}"
+
+    db.insert_curso(nombre, descripcion, duracion,imagen_url)
     flash("Curso agregado con éxito ✅", "success")
     return redirect(url_for("admin"))
 
 
-def get_usuario_id_desde_cookie():
-    from flask import request
-    usu_cookie = request.cookies.get("usu")
-    if usu_cookie:
-        try:
-            # Se espera un formato tipo "14_RS" → ID_nombreInicialApellidoInicial
-            usuario_id = int(usu_cookie.split("_")[0])
-            return usuario_id
-        except (IndexError, ValueError):
-            return None
-    return None
+@app.route("/abandonar_curso/<int:curso_id>", methods=["POST"])
+def abandonar_curso(curso_id):
+    usuario_id = db.get_usuario_id_desde_cookie()
+    if not usuario_id:
+        return redirect(url_for("login"))
+
+    db.eliminar_usuario_curso(usuario_id, curso_id)
+    flash("Te has dado de baja del curso.", "info")
+    return redirect(url_for("mis_cursos"))
+
+
+@app.route("/borrar_usuario/<int:usuario_id>", methods=["POST"])
+def borrar_usuario(usuario_id):
+    if session.get("role") not in ["admin", "super"]:
+        flash("No autorizado", "danger")
+        return redirect(url_for("admin"))
+
+    db.delete_usuario(usuario_id)
+    flash("Usuario eliminado", "success")
+    return redirect(url_for("admin"))
+
+
+@app.route("/borrar_curso/<int:curso_id>", methods=["POST"])
+def borrar_curso(curso_id):
+    if session.get("role") not in ["admin", "super"]:
+        flash("No autorizado", "danger")
+        return redirect(url_for("admin"))
+
+    db.delete_curso(curso_id)
+    flash("Curso eliminado", "success")
+    return redirect(url_for("admin"))
+

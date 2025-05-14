@@ -1,67 +1,142 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4">Panel de Administración</h2>
+<div class="container mt-4">
+  <h2>Panel de Administración</h2>
 
-  <!-- AGREGAR USUARIO -->
-  <div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-      Agregar Usuario
-    </div>
-    <div class="card-body">
+
+  <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+    {% if session.get('role') in ['super'] %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">Usuarios</button>
+    </li>
+    {% endif %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos" type="button" role="tab">Cursos</button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3">
+    {% if session.get('role') in ['super'] %}
+    <!-- USUARIOS -->
+    <div class="tab-pane fade show active" id="usuarios" role="tabpanel">
+      <h4>Agregar Usuario</h4>
       <form method="POST" action="{{ url_for('agregar_usuario') }}">
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" name="nombre" required>
+        <div class="row">
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="nombre" placeholder="Nombre" required>
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="apellido" placeholder="Apellido" required>
+          </div>
+          <div class="col-md-3">
+            <input type="email" class="form-control" name="email" placeholder="Email" required>
+          </div>
+          <div class="col-md-3">
+            <input type="password" class="form-control" name="passw" placeholder="Contraseña" required>
+          </div>
+          <div class="col-md-3 mt-2">
+            <select class="form-select" name="role" required>
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+              <option value="super">Super</option>
+            </select>
+          </div>
+          <div class="col-md-3 mt-2">
+            <button type="submit" class="btn btn-success">Agregar</button>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="apellido" class="form-label">Apellido</label>
-          <input type="text" class="form-control" id="apellido" name="apellido" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="mb-3">
-          <label for="passw" class="form-label">Contraseña</label>
-          <input type="password" class="form-control" id="passw" name="passw" required>
-        </div>
-        <div class="mb-3">
-          <label for="role" class="form-label">Rol</label>
-          <select class="form-select" name="role" required>
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-            {% if session.get('role') in ['super'] %}
-            <option value="super">Super</option>
-            {% endif %}
-          </select>
-        </div>
-        <button type="submit" class="btn btn-success">Crear Usuario</button>
       </form>
-    </div>
-  </div>
 
-  <!-- AGREGAR CURSO -->
-  <div class="card">
-    <div class="card-header bg-secondary text-white">
-      Agregar Curso
+      <hr>
+      <h5>Usuarios Registrados</h5>
+      <ul class="list-group">
+        {% for user in usuarios %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ user.nombre }} {{ user.apellido }} ({{ user.email }}) - Rol: {{ user.rol_nombre }}
+          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ user.id }}">
+            🗑 Eliminar
+          </button>
+          <!-- MODAL DE CONFIRMACIÓN -->
+          <div class="modal fade" id="confirmarEliminar{{ user.id }}" tabindex="-1" aria-labelledby="modalLabel{{ user.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="POST" action="{{ url_for('borrar_usuario', usuario_id=user.id) }}">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel{{ user.id }}">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    ¿Estás seguro de que quieres eliminar al usuario <strong>{{ user.nombre }} {{ user.apellido }}</strong>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </li>
+        {% endfor %}
+      </ul>
     </div>
-    <div class="card-body">
-      <form method="POST" action="{{ url_for('agregar_curso') }}">
-        <div class="mb-3">
-          <label for="nombre_curso" class="form-label">Nombre del curso</label>
-          <input type="text" class="form-control" id="nombre_curso" name="nombre" required>
-        </div>
-        <div class="mb-3">
-          <label for="descripcion" class="form-label">Descripción</label>
-          <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-          <label for="duracion" class="form-label">Duración (horas)</label>
-          <input type="number" class="form-control" id="duracion" name="duracion" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Agregar Curso</button>
-      </form>
+{% endif %}
+    <!-- CURSOS -->
+    <div class="tab-pane fade" id="cursos" role="tabpanel">
+      <h4>Agregar Curso</h4>
+        <form method="POST" action="{{ url_for('agregar_curso') }}" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="nombre_curso" class="form-label">Nombre del curso</label>
+            <input type="text" class="form-control" id="nombre_curso" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="duracion" class="form-label">Duración (horas)</label>
+            <input type="number" class="form-control" id="duracion" name="duracion" required>
+          </div>
+          <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen del curso</label>
+            <input type="file" class="form-control" id="imagen" name="imagen">
+          </div>
+          <button type="submit" class="btn btn-primary">Agregar Curso</button>
+        </form>
+
+      <hr>
+      <h5>Cursos Disponibles</h5>
+      <ul class="list-group">
+        {% for curso in cursos %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ curso.nombre }} - {{ curso.duracion }}h
+           <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ curso.id }}">
+            🗑 Eliminar
+          </button>
+          <!-- MODAL DE CONFIRMACIÓN -->
+          <div class="modal fade" id="confirmarEliminar{{ curso.id }}" tabindex="-1" aria-labelledby="modalLabel{{ curso.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="POST" action="{{ url_for('borrar_curso', curso_id=curso.id) }}">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel{{ curso.id }}">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    ¿Estás seguro de que quieres eliminar al usuario <strong>{{ curso.nombre }}</strong>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
 </div>

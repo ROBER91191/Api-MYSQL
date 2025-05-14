@@ -25,21 +25,26 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           {% if session.get('role') %}
+            <!-- Home, Mis Cursos, Logout visibles para cualquier usuario logueado -->
             <li class="nav-item">
               <a class="nav-link {% if active_page == 'home' %}active{% endif %}" href="{{ url_for('mostrar_cursos') }}">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if active_page == 'mis_cursos' %}active{% endif %}" href="{{ url_for('mis_cursos') }}">Mis Cursos</a>
             </li>
-            {% if session.get('role') in ['admin', 'super'] %}
-            <li class="nav-item">
-              <a class="nav-link {% if active_page == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}">Admin</a>
-            </li>
+
+            {% if session['role'] in ['admin', 'super'] %}
+              <li class="nav-item">
+                <a class="nav-link {% if active_page == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}">Admin</a>
+              </li>
             {% endif %}
+
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
             </li>
+
           {% else %}
+            <!-- Si no está logueado -->
             <li class="nav-item">
               <a class="nav-link {% if active_page == 'register' %}active{% endif %}" href="{{ url_for('signup') }}">Registro</a>
             </li>
@@ -48,6 +53,7 @@
             </li>
           {% endif %}
         </ul>
+
       </div>
     </div>
   </nav>

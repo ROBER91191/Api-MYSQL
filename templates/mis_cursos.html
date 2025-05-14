@@ -8,14 +8,20 @@
     {% for curso in cursos %}
     <div class="col">
       <div class="card h-100">
-        <img src="https://via.placeholder.com/300x150?text=Curso+{{ curso[0] }}" class="card-img-top" alt="Imagen Curso">
+        <img src="{{ curso.imagen_url or 'https://via.placeholder.com/300x150?text=Curso' }}" class="card-img-top" alt="Imagen Curso">
         <div class="card-body">
           <h5 class="card-title">{{ curso[1] }}</h5>
           <p class="card-text">{{ curso[2] }}</p>
           <p><strong>Duración:</strong> {{ curso[3] }} horas</p>
+
+          <form method="POST" action="{{ url_for('abandonar_curso', curso_id=curso.id) }}">
+            <button type="submit" class="btn btn-danger btn-sm">Abandonar</button>
+          </form>
+
         </div>
       </div>
     </div>
+
     {% endfor %}
   </div>
   {% else %}

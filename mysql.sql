@@ -28,6 +28,8 @@ CREATE TABLE users (
     FOREIGN KEY (id_rol) REFERENCES usu_rol(id)
 );
 
+ALTER TABLE users ADD COLUMN imagen_url TEXT (255);
+
 -- Tabla sesiones
 CREATE TABLE user_sessions (
     id          INT NOT NULL AUTO_INCREMENT,

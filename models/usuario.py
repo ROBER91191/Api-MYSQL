@@ -12,3 +12,4 @@ class Usuario(db.Model):
     fecha_mod = db.Column(db.DateTime)
     tipo=db.Column(db.String(50))
     habilitado = db.Column(db.Boolean, default=True)
+    imagen_url = db.Column(db.String(255))

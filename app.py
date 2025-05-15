@@ -152,6 +152,7 @@ def login():
 
                     # Guardamos la cookie "usu", válida por 5 minutos (300 segundos)
                     resp.set_cookie("usu", cookie_str, max_age=60*5)
+                    session['usuario_nombre'] = loged_user.nombre
                     return resp
                 else:
                     return render_template("login.html", show_data_aftersend=True, rerror=True,
@@ -167,40 +168,40 @@ def login():
                                 email=email, passw=passw)
 
 
-@app.route("/userdata/edit", methods=["GET", "POST"])
-def edit_user():
-    cookie = request.cookies.get("usu")
-    if not cookie:
-        return redirect(url_for("login"))
+# @app.route("/userdata/edit", methods=["GET", "POST"])
+# def edit_user():
+#     cookie = request.cookies.get("usu")
+#     if not cookie:
+#         return redirect(url_for("login"))
     
-    try:
-        user_id = int(cookie.split("_")[0])
-    except:
-        return redirect(url_for("login"))
+#     try:
+#         user_id = int(cookie.split("_")[0])
+#     except:
+#         return redirect(url_for("login"))
 
-    user = db.get_user_by_id(user_id)
-    if not user:
-        return redirect(url_for("login"))
+#     user = db.get_user_by_id(user_id)
+#     if not user:
+#         return redirect(url_for("login"))
 
-    if request.method == "GET":
-        return render_template("edit_user.html", user=user, updated=False, error=False)
+#     if request.method == "GET":
+#         return render_template("edit_user.html", user=user, updated=False, error=False)
 
-    if request.method == "POST":
-        nombre = request.form.get("nombre")
-        apellido = request.form.get("apellido")
-        nueva_pass = request.form.get("passw")
+#     if request.method == "POST":
+#         nombre = request.form.get("nombre")
+#         apellido = request.form.get("apellido")
+#         nueva_pass = request.form.get("passw")
 
-        # Validaciones básicas (puedes usar validate si lo prefieres)
-        if not nombre or not apellido or not nueva_pass:
-            return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Todos los campos son obligatorios.")
+#         # Validaciones básicas (puedes usar validate si lo prefieres)
+#         if not nombre or not apellido or not nueva_pass:
+#             return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Todos los campos son obligatorios.")
 
-        result = db.update_user_data(user_id, nombre, apellido, nueva_pass)
-        user = db.get_user_by_id(user_id)  # refrescar datos por si cambió algo
+#         result = db.update_user_data(user_id, nombre, apellido, nueva_pass)
+#         user = db.get_user_by_id(user_id)  # refrescar datos por si cambió algo
 
-        if result:
-            return render_template("edit_user.html", user=user, updated=True, error=False)
-        else:
-            return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Error al actualizar los datos.")
+#         if result:
+#             return render_template("edit_user.html", user=user, updated=True, error=False)
+#         else:
+#             return render_template("edit_user.html", user=user, updated=False, error=True, error_msg="Error al actualizar los datos.")
 
 
 @app.route("/userdata/all")
@@ -392,4 +393,85 @@ def borrar_curso(curso_id):
     db.delete_curso(curso_id)
     flash("Curso eliminado", "success")
     return redirect(url_for("admin"))
+
+
+@app.route("/userdata/edit", methods=["GET", "POST"])
+def edit_user():
+    usuario_id = db.get_usuario_id_desde_cookie()
+    user = db.get_usuario_by_id(usuario_id)
+
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        nueva_pass = request.form.get("password")
+        imagen = request.files.get("imagen")
+
+        updated_user = db.update_usuario_con_imagen(user, nombre, apellido, nueva_pass, imagen)
+
+        # Refrescar sesión para mostrar en navbar
+        session['usuario_nombre'] = updated_user.nombre
+        if updated_user.imagen_url:
+            session['usuario_imagen'] = updated_user.imagen_url
+
+        flash("Datos actualizados correctamente", "success")
+        return redirect(url_for("edit_user"))
+
+    return render_template("editar_usuario.html", user=user)
+
+
+@app.route("/editar_usuario/<int:usuario_id>", methods=["GET", "POST"])
+def editar_usuario(usuario_id):
+    usuario_logueado_id = db.get_usuario_id_desde_cookie()
+    usuario_logueado = db.get_usuario_by_id(usuario_logueado_id)
+
+    if not usuario_logueado or (session.get("role") != "super" and usuario_logueado.id != usuario_id):
+        flash("Acceso denegado", "danger")
+        return redirect(url_for("mostrar_cursos"))
+
+    usuario = db.get_usuario_by_id(usuario_id)
+    if not usuario:
+        flash("Usuario no encontrado", "warning")
+        return redirect(url_for("admin"))
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        email = request.form.get("email") if session['role'] == "super" else usuario.email
+        rol = request.form.get("role") if session['role'] == "super" else None
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        imagen = request.files.get("imagen")
+
+        if password and password != confirm_password:
+            flash("Las contraseñas no coinciden ❌", "danger")
+            return render_template("editar_usuario.html", user=usuario)
+
+        ok = db.actualizar_usuario_general(
+            user=usuario,
+            nombre=nombre,
+            apellido=apellido,
+            email=email,
+            nueva_pass=password,
+            rol=rol,
+            imagen=imagen
+        )
+
+        if ok:
+            # Refrescar sesión si edita su propio perfil
+            if usuario.id == usuario_logueado_id:
+                session['usuario_nombre'] = usuario.nombre
+                if usuario.imagen_url:
+                    session['usuario_imagen'] = usuario.imagen_url
+
+            flash("Cambios guardados ✅", "success")
+        else:
+            flash("Error al guardar los cambios", "danger")
+
+        return redirect(url_for("admin" if session['role'] == "super" else "edit_user"))
+
+    return render_template("editar_usuario.html", user=usuario)
+
 

@@ -77,6 +77,56 @@ def get_usuario_id_desde_cookie():
             return None
     return None
 
+import os
+import uuid
+from werkzeug.utils import secure_filename
+from datetime import datetime
+from models.usuario import Usuario
+from models import db
+
+def get_usuario_by_id(user_id):
+    return Usuario.query.get(user_id)
+
+
+def update_usuario_con_imagen(user, nombre, apellido, nueva_pass=None, imagen=None):
+    user.nombre = nombre
+    user.apellido = apellido
+
+    if nueva_pass:
+        user.password = hash_password(nueva_pass)
+
+    if imagen and imagen.filename != "":
+        filename = secure_filename(f"{uuid.uuid4().hex}_{imagen.filename}")
+        ruta = os.path.join("static/uploads", filename)
+        imagen.save(ruta)
+        user.imagen_url = f"/static/uploads/{filename}"
+    
+    db.session.commit()
+    return user
+
+def actualizar_usuario_por_admin(user, nombre, apellido, email, rol_nombre, nueva_pass=None, imagen=None):
+    user.nombre = nombre
+    user.apellido = apellido
+    user.email = email
+    user.id_rol = get_rol_id_by_name(rol_nombre)
+
+    if nueva_pass:
+        from db import hash_password
+        user.password = hash_password(nueva_pass)
+
+    if imagen and imagen.filename != "":
+        filename = secure_filename(f"{uuid.uuid4().hex}_{imagen.filename}")
+        ruta = os.path.join("static/uploads", filename)
+        imagen.save(ruta)
+        user.imagen_url = f"/static/uploads/{filename}"
+
+    try:
+        db.session.commit()
+        return True
+    except:
+        db.session.rollback()
+        return False
+
 
 def delete_usuario(usuario_id):
     usuario = Usuario.query.get(usuario_id)

@@ -15,48 +15,54 @@
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('mostrar_cursos') }}">CursosApp</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          {% if session.get('role') %}
-            <!-- Home, Mis Cursos, Logout visibles para cualquier usuario logueado -->
-            <li class="nav-item">
-              <a class="nav-link {% if active_page == 'home' %}active{% endif %}" href="{{ url_for('mostrar_cursos') }}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if active_page == 'mis_cursos' %}active{% endif %}" href="{{ url_for('mis_cursos') }}">Mis Cursos</a>
-            </li>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('mostrar_cursos') }}">CursosApp</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-            {% if session['role'] in ['admin', 'super'] %}
-              <li class="nav-item">
-                <a class="nav-link {% if active_page == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}">Admin</a>
-              </li>
-            {% endif %}
-
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-
-          {% else %}
-            <!-- Si no está logueado -->
-            <li class="nav-item">
-              <a class="nav-link {% if active_page == 'register' %}active{% endif %}" href="{{ url_for('signup') }}">Registro</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if active_page == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Login</a>
-            </li>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- IZQUIERDA: Home + Admin -->
+      <ul class="navbar-nav me-auto">
+        {% if session.get('role') %}
+          <li class="nav-item">
+            <a class="nav-link {% if active_page == 'home' %}active{% endif %}" href="{{ url_for('mostrar_cursos') }}">Home</a>
+          </li>
+          {% if session['role'] in ['admin', 'super'] %}
+          <li class="nav-item">
+            <a class="nav-link {% if active_page == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}">Admin</a>
+          </li>
           {% endif %}
-        </ul>
+        {% endif %}
+      </ul>
 
-      </div>
+      <!-- DERECHA: Perfil del Usuario -->
+      {% if session.get('role') %}
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="btn btn-sm btn-warning dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            {% if session.get('usuario_imagen') %}
+              <img src="{{ session['usuario_imagen'] }}" class="rounded-circle" width="32" height="32" alt="Avatar">
+            {% endif %}
+            {{ session['usuario_nombre'] or 'Mi Perfil' }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('edit_user') }}">🧾 Perfil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('mis_cursos') }}">🎓 Mis Cursos</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">🔓 Cerrar Sesión</a></li>
+          </ul>
+        </li>
+      </ul>
+      {% endif %}
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <!-- Contenido principal -->
   <div class="container mt-4">

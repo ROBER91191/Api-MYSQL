@@ -53,9 +53,26 @@
         {% for user in usuarios %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           {{ user.nombre }} {{ user.apellido }} ({{ user.email }}) - Rol: {{ user.rol_nombre }}
-          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ user.id }}">
-            🗑 Eliminar
-          </button>
+          
+          <div class="d-flex gap-2">
+            {% if session.get('role') == 'super' %}
+            <!-- Botón de edición -->
+            <a href="{{ url_for('editar_usuario', usuario_id=user.id) }}" 
+              class="btn btn-sm btn-primary" 
+              data-bs-toggle="tooltip" 
+              title="Editar usuario">
+              ✏️
+            </a>
+            {% endif %}
+
+            <!-- Botón de eliminar -->
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ user.id }}"
+            ata-bs-toggle="tooltip" 
+              title="Eiminar usuario">
+              🗑
+            </button>
+          </div>
+
           <!-- MODAL DE CONFIRMACIÓN -->
           <div class="modal fade" id="confirmarEliminar{{ user.id }}" tabindex="-1" aria-labelledby="modalLabel{{ user.id }}" aria-hidden="true">
             <div class="modal-dialog">
@@ -76,10 +93,18 @@
               </div>
             </div>
           </div>
-
         </li>
         {% endfor %}
       </ul>
+
+      <script>
+        // Activar tooltips de Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+      </script>
+
     </div>
 {% endif %}
     <!-- CURSOS -->

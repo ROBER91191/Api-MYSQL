@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Editar Usuario</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="row">
+      <!-- 📋 COLUMNA IZQUIERDA: Campos -->
+      <div class="col-md-8">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" name="nombre" id="nombre" value="{{ user.nombre }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="apellido" class="form-label">Apellido</label>
+          <input type="text" class="form-control" name="apellido" id="apellido" value="{{ user.apellido }}" required>
+        </div>
+
+        {% if session['role'] == 'super' %}
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" name="email" id="email" value="{{ user.email }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="role" class="form-label">Rol</label>
+          <select name="role" class="form-select" required>
+            <option value="user" {% if user.id_rol == 3 %}selected{% endif %}>Usuario</option>
+            <option value="admin" {% if user.id_rol == 2 %}selected{% endif %}>Administrador</option>
+            <option value="super" {% if user.id_rol == 1 %}selected{% endif %}>Super</option>
+          </select>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Nueva contraseña</label>
+          <input type="password" class="form-control" name="password" id="password">
+        </div>
+
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control" name="confirm_password" id="confirm_password">
+        </div>
+      </div>
+
+      <!-- 🖼 COLUMNA DERECHA: Imagen -->
+      <div class="col-md-4 text-center">
+        <label class="form-label">Imagen de perfil</label>
+        <div class="mb-3">
+          <img id="preview" src="{{ user.imagen_url or 'https://via.placeholder.com/150?text=Sin+Imagen' }}" 
+               class="img-thumbnail mb-2" width="150" alt="Preview Imagen">
+        </div>
+        <div class="mb-3">
+          <input type="file" class="form-control" name="imagen" id="imagen" accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+  </form>
+</div>
+
+<!-- JS para mostrar preview en vivo -->
+<script>
+  const inputImagen = document.getElementById('imagen');
+  const preview = document.getElementById('preview');
+
+  inputImagen.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+{% endblock %}

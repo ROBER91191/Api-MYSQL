@@ -1,18 +1,41 @@
-{% extends "layout.html"%}
-{% block title %}
-{% endblock %}
-Home
-{% block header %}
-    <h1 class="mx-5">Bienvenido</h1>
-{% endblock %}
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
 
 {% block content %}
-    <p>Para ver el contenido debes estar registrado</p>
-    <p class="lead"></p>
-    <a class="btn btn-lg btn-success" href="{{ url_for('signup') }}" role="button">Registrarse</a>
-    <a class="btn btn-lg btn-success" href="{{ url_for('login') }}" role="button">Logarse</a>
-    </p>
+  <h1 class="mx-5 mb-4">Bienvenido</h1>
+
+  {% if cursos %}
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+      {% for curso in cursos %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            {% if curso.imagen_url %}
+              <img src="{{ curso.imagen_url }}" class="card-img-top" alt="{{ curso.nombre }}">
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ curso.nombre }}</h5>
+              <p class="card-text flex-grow-1">{{ curso.descripcion }}</p>
+              <p class="text-muted">Duración: {{ curso.duracion }} horas</p>
+              <a href="{{ url_for('detalle_curso', curso_id=curso.id) }}" class="btn btn-primary mt-auto">Ver detalles</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center mb-5">
+      Actualmente no tenemos cursos disponibles. ¡Vuelve pronto!
+    </div>
+  {% endif %}
+
+  {% if not session.get('role') %}
+    <div class="text-center">
+      <p>Para inscribirte y acceder al contenido debes registrarte o iniciar sesión:</p>
+      <a class="btn btn-primary btn-lg me-3" href="{{ url_for('signup') }}" role="button">Registrarse</a>
+      <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Iniciar sesión</a>
+    </div>
+  {% endif %}
 {% endblock %}
 
-{% block footer %}
-{% endblock %}
+{% block footer %}{% endblock %}

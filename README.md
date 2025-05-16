@@ -12,3 +12,8 @@ pip install flask-sqlalchemy flask-migrate python-dotenv
 
 # Evitar problema con la aplicación FLASK_APP
 set FLASK_APP=app.py 
+
+# Migraciones
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade

@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Editar curso</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="row">
+      <!-- 📋 COLUMNA IZQUIERDA: Campos -->
+      <div class="col-md-8">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" name="nombre" id="nombre" 
+                 value="{{ curso.nombre }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="descripcion" class="form-label">Descripción</label>
+          <textarea class="form-control" name="descripcion" id="descripcion" 
+                    rows="5" required>{{ curso.descripcion }}</textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="duracion" class="form-label">Duración (horas)</label>
+              <input type="number" class="form-control" name="duracion" id="duracion" 
+                     value="{{ curso.duracion }}" min="1" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3 form-check form-switch pt-4">
+              <input type="checkbox" class="form-check-input" name="disponible" id="disponible" 
+                     {% if curso.disponible %}checked{% endif %} style="transform: scale(1.5)">
+              <label class="form-check-label ms-2" for="disponible">Disponible</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🖼 COLUMNA DERECHA: Imagen -->
+      <div class="col-md-4 text-center">
+        <label class="form-label">Imagen</label>
+        <div class="mb-3">
+          <img id="preview" src="{{ curso.imagen_url or 'https://via.placeholder.com/300?text=Sin+Imagen' }}" 
+               class="img-thumbnail mb-2" style="max-width: 100%; max-height: 200px;" alt="Preview Imagen">
+        </div>
+        <div class="input-group mb-3">
+          <label class="input-group-text btn btn-outline-secondary" style="cursor: pointer;">
+            <i class="fas fa-upload me-2"></i>Subir
+            <input type="file" class="d-none" name="imagen" id="imagen" accept="image/*">
+          </label>
+          <input type="text" class="form-control" id="nombre-archivo" 
+                 value="{{ curso.imagen_url.split('/')[-1] if curso.imagen_url else 'Ningún archivo seleccionado' }}" 
+                 readonly>
+        </div>
+        <small class="text-muted">Formatos: JPG, PNG (Max. 2MB)</small>
+      </div>
+    </div>
+
+    <div class="text-end mt-3">
+      <a href="{{ url_for('admin') }}" class="btn btn-secondary me-2">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+  </form>
+</div>
+
+<!-- JS para mostrar preview en vivo -->
+<script>
+  document.getElementById('imagen').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('preview');
+    const nombreArchivo = document.getElementById('nombre-archivo');
+
+    if (file) {
+      // Validar tamaño (2MB máximo)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('El archivo es demasiado grande (máximo 2MB)');
+        event.target.value = '';
+        return;
+      }
+
+      // Mostrar preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+      
+      // Mostrar nombre de archivo
+      nombreArchivo.value = file.name;
+    } else {
+      nombreArchivo.value = "{{ curso.imagen_url.split('/')[-1] if curso.imagen_url else 'Ningún archivo seleccionado' }}";
+    }
+  });
+</script>
+{% endblock %}

@@ -5,24 +5,23 @@ import db  # tu lógica de negocio / servicios
 import os
 from dotenv import load_dotenv
 import validate  # tu módulo de validaciones
-import uuid
 from werkzeug.utils import secure_filename
+from flask_migrate import Migrate
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'clave_por_defecto')  # ✅ asegúrate de tener esto en tu .env
+app.secret_key = os.getenv('SECRET_KEY', 'clave_por_defecto')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mysql+pymysql://usuario:clave@localhost/mydb')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicializar ORM
 orm_db.init_app(app)
 
+# Crear bbdd a partir de los modelos
+migrate = Migrate(app, orm_db)
 
-# source .venv/Scripts/activate
-# pip install flask
-# python -m flask run
 
 @app.route("/")
 def home():
@@ -419,7 +418,7 @@ def edit_user():
         flash("Datos actualizados correctamente", "success")
         return redirect(url_for("edit_user"))
 
-    return render_template("editar_usuario.html", user=user)
+    return render_template("editar_usuario.html", user=user,active_tab='Usuarios')
 
 
 @app.route("/editar_usuario/<int:usuario_id>", methods=["GET", "POST"])
@@ -449,13 +448,13 @@ def editar_usuario(usuario_id):
             flash("Las contraseñas no coinciden ❌", "danger")
             return render_template("editar_usuario.html", user=usuario)
 
-        ok = db.actualizar_usuario_general(
+        ok = db.actualizar_usuario_por_admin(
             user=usuario,
             nombre=nombre,
             apellido=apellido,
             email=email,
             nueva_pass=password,
-            rol=rol,
+            rol_nombre=rol,
             imagen=imagen
         )
 
@@ -472,6 +471,56 @@ def editar_usuario(usuario_id):
 
         return redirect(url_for("admin" if session['role'] == "super" else "edit_user"))
 
-    return render_template("editar_usuario.html", user=usuario)
+    return render_template("editar_usuario.html", user=usuario ,active_tab="user")
 
 
+@app.route("/editar_curso/<int:curso_id>", methods=["GET", "POST"])
+def editar_curso(curso_id):
+    # Verificar permisos (solo super y admin pueden editar cursos)
+    if session.get("role") not in ["super", "admin"]:
+        flash("Acceso denegado", "danger")
+        return redirect(url_for("mostrar_cursos"))
+
+    # Obtener el curso a editar
+    curso = db.get_curso_by_id(curso_id)
+    if not curso:
+        flash("Curso no encontrado", "warning")
+        return redirect(url_for("admin"))
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        descripcion = request.form.get("descripcion")
+        duracion = request.form.get("duracion")
+        imagen = request.files.get("imagen")
+
+        # Validaciones básicas
+        if not nombre or not descripcion or not duracion:
+            flash("Todos los campos son obligatorios", "danger")
+            return render_template("editar_curso.html", curso=curso, active_tab="cursos")
+
+        try:
+            duracion = int(duracion)
+            if duracion <= 0:
+                raise ValueError
+        except ValueError:
+            flash("La duración debe ser un número positivo", "danger")
+            return render_template("editar_curso.html", curso=curso, active_tab="cursos")
+
+        # Actualizar curso
+        ok = db.actualizar_curso(
+            curso=curso,
+            nombre=nombre,
+            descripcion=descripcion,
+            duracion=duracion,
+            imagen=imagen
+        )
+
+        if ok:
+            flash("Curso actualizado correctamente ✅", "success")
+        else:
+            flash("Error al actualizar el curso", "danger")
+
+        return redirect(url_for("admin", active_tab="cursos"))
+
+    # Mostrar formulario de edición
+    return render_template("editar_curso.html", curso=curso, active_tab="cursos")

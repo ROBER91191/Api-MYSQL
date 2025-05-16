@@ -3,7 +3,6 @@
 <div class="container mt-4">
   <h2>Panel de Administración</h2>
 
-
   <ul class="nav nav-tabs" id="adminTabs" role="tablist">
     {% if session.get('role') in ['super'] %}
     <li class="nav-item" role="presentation">
@@ -15,10 +14,10 @@
     </li>
   </ul>
 
-  <div class="tab-content mt-3">
+  <div class="tab-content mt-3" id="adminTabsContent">
     {% if session.get('role') in ['super'] %}
     <!-- USUARIOS -->
-    <div class="tab-pane fade show active" id="usuarios" role="tabpanel">
+    <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
       <h4>Agregar Usuario</h4>
       <form method="POST" action="{{ url_for('agregar_usuario') }}">
         <div class="row">
@@ -108,7 +107,7 @@
     </div>
 {% endif %}
     <!-- CURSOS -->
-    <div class="tab-pane fade" id="cursos" role="tabpanel">
+    <div class="tab-pane fade" id="cursos" role="tabpanel" aria-labelledby="cursos-tab">
       <h4>Agregar Curso</h4>
         <form method="POST" action="{{ url_for('agregar_curso') }}" enctype="multipart/form-data">
           <div class="mb-3">
@@ -135,10 +134,27 @@
       <ul class="list-group">
         {% for curso in cursos %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{ curso.nombre }} - {{ curso.duracion }}h
-           <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ curso.id }}">
-            🗑 Eliminar
-          </button>
+          {{ curso.nombre }} - {{ curso.duracion }}
+          <div class="d-flex gap-2">
+            {% if session.get('role') == 'super' %}
+            <!-- Botón de edición -->
+            <a href="{{ url_for('editar_curso', curso_id=curso.id) }}" 
+              class="btn btn-sm btn-primary" 
+              data-bs-toggle="tooltip" 
+              title="Editar curso">
+              ✏️
+            </a>
+            {% endif %}
+
+            <!-- Botón de eliminar -->
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ curso.id }}"
+            ata-bs-toggle="tooltip" 
+              title="Eiminar curso">
+              🗑
+            </button>
+          </div>
+
+  
           <!-- MODAL DE CONFIRMACIÓN -->
           <div class="modal fade" id="confirmarEliminar{{ curso.id }}" tabindex="-1" aria-labelledby="modalLabel{{ curso.id }}" aria-hidden="true">
             <div class="modal-dialog">

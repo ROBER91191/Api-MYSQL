@@ -161,6 +161,9 @@ def insert_curso(nombre, descripcion, duracion, imagen):
     db.session.add(nuevo)
     db.session.commit()
 
+def get_curso_by_id(curso_id):
+    return Curso.query.get(curso_id)
+
 def get_cursos_by_usuario(user_id):
     return Curso.query.join(UsuarioCurso).filter(UsuarioCurso.user_id == user_id).all()
 

@@ -9,7 +9,7 @@
     <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
       {% for curso in cursos %}
         <div class="col">
-          <div class="card h-100 shadow-sm">
+          <div class="card h-100 shadow-sm bg-dark text-white">
             {% if curso.imagen_url %}
               <img src="{{ curso.imagen_url }}" class="card-img-top" alt="{{ curso.nombre }}">
             {% endif %}
@@ -17,7 +17,6 @@
               <h5 class="card-title">{{ curso.nombre }}</h5>
               <p class="card-text flex-grow-1">{{ curso.descripcion }}</p>
               <p class="text-muted">Duración: {{ curso.duracion }} horas</p>
-              <a href="{{ url_for('detalle_curso', curso_id=curso.id) }}" class="btn btn-primary mt-auto">Ver detalles</a>
             </div>
           </div>
         </div>

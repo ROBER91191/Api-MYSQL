@@ -22,10 +22,10 @@ orm_db.init_app(app)
 # Crear bbdd a partir de los modelos
 migrate = Migrate(app, orm_db)
 
-
 @app.route("/")
 def home():
-    return render_template("home.html", active_page="home")
+    cursos = db.get_all_cursos()
+    return render_template("home.html", cursos=cursos)
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():

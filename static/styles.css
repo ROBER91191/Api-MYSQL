@@ -1,0 +1,251 @@
+/* 1. Variables de color */
+:root {
+  --bg-page: #121212;        /* Fondo general */
+  --bg-card: #1e1e1e;        /* Tarjetas, paneles */
+  --text-main: #e0e0e0;      /* Texto principal */
+  --text-muted: #a0a0a0;     /* Texto secundario */
+  --accent: #1fb6ff;         /* Azul vibrante */
+  --accent-hover: #0ea5e9;   /* Azul hover */
+  --shadow: rgba(0, 0, 0, 0.7); /* Sombra fuerte */
+}
+
+/* 2. Reset básico y base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.5;
+}
+
+/* 3. Contenedor fluido con margen auto */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+/* 4. Navbar oscuro */
+nav.navbar {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid #2a2a2a;
+  padding: 1rem 0;
+}
+nav .navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent) !important;
+}
+nav .nav-link {
+  color: var(--text-main) !important;
+  margin-left: 1rem;
+  transition: color 0.2s;
+}
+nav .nav-link:hover {
+  color: var(--accent) !important;
+}
+
+/* 5. Hero en dos columnas */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 4rem 0;
+}
+.hero-content {
+  text-align: left;
+}
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+.hero-content p {
+  font-size: 1.125rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+.buttons-group {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 6. Botones oscuros “bonitos” */
+.btn-primary {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 10px var(--shadow);
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px var(--shadow);
+}
+.btn-secondary {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
+}
+.btn-secondary:hover {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+/* 7. Grid de tarjetas alineado a la izquierda */
+.cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: flex-start;
+}
+.cards-grid .card {
+  background-color: var(--bg-card);
+  border: none;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--shadow);
+  flex: 1 1 calc(33% - 1.5rem);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cards-grid .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px var(--shadow);
+}
+.card-img-top {
+  width: 100%;
+  display: block;
+}
+.card-body {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.card-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+.card-text {
+  flex: 1;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+/* 8. Formularios centrados en panel */
+.form-container {
+  background-color: var(--bg-card);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px var(--shadow);
+  max-width: 400px;
+  margin: 2rem auto;
+}
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.5rem;
+  background-color: #2a2a2a;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 9. Footer simple */
+footer {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--text-muted);
+  border-top: 1px solid #2a2a2a;
+}
+
+/* 1. Contenedor alineado a la izquierda */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0;            /* eliminamos el auto centrar */
+  padding: 2rem 5%;     /* algo de margen lateral */
+}
+
+/* 2. Hero en dos columnas, sin centrar contenidos */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 4rem 5%;
+  text-align: left;     /* aseguramos alineación a la izquierda */
+}
+
+/* 3. Grid de tarjetas empezando en la izquierda */
+.cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: flex-start;  /* arrancamos desde la izquierda */
+  padding: 0 5%;
+}
+
+/* 4. Formulario no centrado, panel al inicio */
+.form-container {
+  margin: 2rem 5%;      /* margen superior e izquierda */
+  max-width: 400px;
+}
+
+/* 5. Footer con padding lateral */
+footer {
+  padding: 2rem 5%;
+  text-align: left;
+}
+
+/* Alinear contenido sólo en pantallas ≥992px */
+@media (min-width: 992px) {
+  .content-wrapper {
+    display: flex;
+    flex-wrap: wrap;          /* permite que items quepan en varias filas */
+    justify-content: center;  /* centra grupos de items */
+    align-items: flex-start;  /* alinea arriba */
+    gap: 2rem;
+    overflow: visible;        /* asegurarse de que nada se oculte */
+  }
+  .content-wrapper > * {
+    flex: 1 1 auto;           /* ítems flexibles que crecen y encogen */
+    max-width: 1200px;
+    width: auto;              /* elimina el width:100% forzado */
+  }
+  .content-wrapper .btn {
+    flex-shrink: 0;           /* el botón no se encogerá */
+    white-space: nowrap;      /* evita saltos de línea dentro del texto */
+  }
+}

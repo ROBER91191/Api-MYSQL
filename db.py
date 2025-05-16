@@ -5,7 +5,10 @@ from models.usuarioCurso import UsuarioCurso
 from models.userSessions import UserSession
 from models.userRole import UserRole
 from sqlalchemy.exc import IntegrityError
-
+import os
+import uuid
+from werkzeug.utils import secure_filename
+from datetime import datetime
 from datetime import datetime
 import hashlib
 
@@ -77,12 +80,7 @@ def get_usuario_id_desde_cookie():
             return None
     return None
 
-import os
-import uuid
-from werkzeug.utils import secure_filename
-from datetime import datetime
-from models.usuario import Usuario
-from models import db
+
 
 def get_usuario_by_id(user_id):
     return Usuario.query.get(user_id)
@@ -179,6 +177,38 @@ def get_cursos_usuario(user_id):
     )
     return cursos
 
+def actualizar_curso(curso, nombre, descripcion, duracion, imagen=None, disponible=None):
+
+    curso.nombre = nombre
+    curso.descripcion = descripcion
+    curso.duracion = duracion
+    
+    if disponible is not None:
+        curso.disponible = disponible
+    
+    if imagen and imagen.filename != '':
+        # Eliminar imagen anterior si existe
+        if curso.imagen_url:
+            try:
+                os.remove(os.path.join('static', curso.imagen_url.lstrip('/')))
+            except OSError:
+                pass  # Si no existe el archivo, continuamos
+        
+        # Guardar nueva imagen
+        filename = secure_filename(f"{uuid.uuid4().hex}_{imagen.filename}")
+        upload_path = os.path.join('static', 'uploads', 'cursos', filename)
+        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+        imagen.save(upload_path)
+        curso.imagen_url = f"/static/uploads/cursos/{filename}"
+
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al actualizar curso: {str(e)}")
+        return False
+    
 def delete_curso(curso_id):
     curso = Curso.query.get(curso_id)
     if curso:

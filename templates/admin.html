@@ -51,6 +51,11 @@
       <ul class="list-group">
         {% for user in usuarios %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="form-check form-switch me-3">
+              <input class="form-check-input" type="checkbox" role="switch" 
+                    id="user-{{ user.id }}" {% if user.habilitado %}checked{% endif %}
+                    onchange="toggleHabilitado('{{ user.id }}', 'usuario')">  <!-- Comillas simples alrededor de user.id -->
+            </div>
           {{ user.nombre }} {{ user.apellido }} ({{ user.email }}) - Rol: {{ user.rol_nombre }}
           
           <div class="d-flex gap-2">
@@ -134,6 +139,11 @@
       <ul class="list-group">
         {% for curso in cursos %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="form-check form-switch me-3">
+          <input class="form-check-input" type="checkbox" role="switch" 
+                id="curso-{{ curso.id }}" {% if curso.disponible %}checked{% endif %}
+                onchange="toggleHabilitado('{{ curso.id }}', 'curso')">
+        </div>
           {{ curso.nombre }} - {{ curso.duracion }}
           <div class="d-flex gap-2">
             {% if session.get('role') == 'super' %}

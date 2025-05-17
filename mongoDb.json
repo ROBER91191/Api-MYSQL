@@ -1,0 +1,311 @@
+db.cursos.insertMany([
+  {
+    "curso_id": "java_para_principiantes",
+    "nombre": "Java para Principiantes",
+    "descripcion": "Aprende los fundamentos de programación con Java",
+    "duracion_total_horas": 50,
+    "nivel": "principiante",
+    "secciones": [
+      {
+        "seccion_id": "intro_java",
+        "titulo": "Introducción a Java",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "historia_java",
+            "titulo": "Historia y Características de Java",
+            "duracion_minutos": 45,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/historia.mp4"
+          },
+          {
+            "tema_id": "configuracion_entorno",
+            "titulo": "Configuración del Entorno de Desarrollo",
+            "duracion_minutos": 60,
+            "tipo": "tutorial",
+            "url_contenido": "/contenido/java/configuracion-entorno.pdf"
+          }
+        ]
+      },
+      {
+        "seccion_id": "sintaxis_basica",
+        "titulo": "Sintaxis Básica",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "hola_mundo",
+            "titulo": "Primer Programa: Hola Mundo",
+            "duracion_minutos": 50,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/hola-mundo.mp4"
+          },
+          {
+            "tema_id": "variables_tipos",
+            "titulo": "Variables y Tipos de Datos",
+            "duracion_minutos": 70,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/variables-tipos.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "curso_id": "java_intermedio",
+    "nombre": "Java Intermedio",
+    "descripcion": "Conceptos avanzados de programación orientada a objetos con Java",
+    "duracion_total_horas": 60,
+    "nivel": "intermedio",
+    "requisitos": ["java_principiante"],
+    "secciones": [
+      {
+        "seccion_id": "poo_avanzado",
+        "titulo": "POO Avanzado",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "herencia_polimorfismo",
+            "titulo": "Herencia y Polimorfismo",
+            "duracion_minutos": 90,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/herencia-polimorfismo.mp4"
+          },
+          {
+            "tema_id": "interfaces_abstractas",
+            "titulo": "Interfaces y Clases Abstractas",
+            "duracion_minutos": 80,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/interfaces-abstractas.mp4"
+          }
+        ]
+      },
+      {
+        "seccion_id": "colecciones",
+        "titulo": "Colecciones Java",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "listas_conjuntos",
+            "titulo": "Listas y Conjuntos",
+            "duracion_minutos": 70,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/listas-conjuntos.mp4"
+          },
+          {
+            "tema_id": "mapas_streams",
+            "titulo": "Mapas y Streams",
+            "duracion_minutos": 90,
+            "tipo": "video",
+            "url_contenido": "/contenido/java/mapas-streams.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "curso_id": "sql_basico",
+    "nombre": "SQL para Principiantes",
+    "descripcion": "Aprende a trabajar con bases de datos relacionales",
+    "duracion_total_horas": 35,
+    "nivel": "principiante",
+    "secciones": [
+      {
+        "seccion_id": "fundamentos_sql",
+        "titulo": "Fundamentos de SQL",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "introduccion_bd",
+            "titulo": "Introducción a Bases de Datos",
+            "duracion_minutos": 50,
+            "tipo": "video",
+            "url_contenido": "/contenido/sql/introduccion-bd.mp4"
+          },
+          {
+            "tema_id": "consultas_select",
+            "titulo": "Consultas SELECT básicas",
+            "duracion_minutos": 60,
+            "tipo": "video",
+            "url_contenido": "/contenido/sql/consultas-select.mp4"
+          }
+        ]
+      },
+      {
+        "seccion_id": "consultas_avanzadas",
+        "titulo": "Consultas Avanzadas",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "joins",
+            "titulo": "JOINs entre tablas",
+            "duracion_minutos": 80,
+            "tipo": "video",
+            "url_contenido": "/contenido/sql/joins.mp4"
+          },
+          {
+            "tema_id": "subconsultas",
+            "titulo": "Subconsultas y Vistas",
+            "duracion_minutos": 70,
+            "tipo": "video",
+            "url_contenido": "/contenido/sql/subconsultas.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "curso_id": "python_basico",
+    "nombre": "Python para Principiantes",
+    "descripcion": "Aprende los fundamentos de programación con Python",
+    "duracion_total_horas": 40,
+    "nivel": "principiante",
+    "secciones": [
+      {
+        "seccion_id": "introduccion_python",
+        "titulo": "Introducción a Python",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "instalacion_python",
+            "titulo": "Instalación y Configuración",
+            "duracion_minutos": 40,
+            "tipo": "tutorial",
+            "url_contenido": "/contenido/python/instalacion.pdf"
+          },
+          {
+            "tema_id": "sintaxis_basica",
+            "titulo": "Sintaxis Básica de Python",
+            "duracion_minutos": 60,
+            "tipo": "video",
+            "url_contenido": "/contenido/python/sintaxis-basica.mp4"
+          }
+        ]
+      },
+      {
+        "seccion_id": "estructuras_datos",
+        "titulo": "Estructuras de Datos",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "listas_tuplas",
+            "titulo": "Listas y Tuplas",
+            "duracion_minutos": 70,
+            "tipo": "video",
+            "url_contenido": "/contenido/python/listas-tuplas.mp4"
+          },
+          {
+            "tema_id": "diccionarios_conjuntos",
+            "titulo": "Diccionarios y Conjuntos",
+            "duracion_minutos": 65,
+            "tipo": "video",
+            "url_contenido": "/contenido/python/diccionarios-conjuntos.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "curso_id": "react_basico",
+    "nombre": "React desde Cero",
+    "descripcion": "Aprende a construir interfaces modernas con React",
+    "duracion_total_horas": 45,
+    "nivel": "intermedio",
+    "requisitos": ["javascript_web"],
+    "secciones": [
+      {
+        "seccion_id": "fundamentos_react",
+        "titulo": "Fundamentos de React",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "componentes_jsx",
+            "titulo": "Componentes y JSX",
+            "duracion_minutos": 80,
+            "tipo": "video",
+            "url_contenido": "/contenido/react/componentes-jsx.mp4"
+          },
+          {
+            "tema_id": "props_state",
+            "titulo": "Props y State",
+            "duracion_minutos": 90,
+            "tipo": "video",
+            "url_contenido": "/contenido/react/props-state.mp4"
+          }
+        ]
+      },
+      {
+        "seccion_id": "hooks",
+        "titulo": "React Hooks",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "use_state_effect",
+            "titulo": "useState y useEffect",
+            "duracion_minutos": 85,
+            "tipo": "video",
+            "url_contenido": "/contenido/react/hooks-basicos.mp4"
+          },
+          {
+            "tema_id": "custom_hooks",
+            "titulo": "Custom Hooks",
+            "duracion_minutos": 75,
+            "tipo": "video",
+            "url_contenido": "/contenido/react/custom-hooks.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "curso_id": "nodejs_basico",
+    "nombre": "Node.js para Principiantes",
+    "descripcion": "Aprende a construir aplicaciones backend con Node.js",
+    "duracion_total_horas": 50,
+    "nivel": "intermedio",
+    "requisitos": ["javascript_web"],
+    "secciones": [
+      {
+        "seccion_id": "introduccion_node",
+        "titulo": "Introducción a Node.js",
+        "orden": 1,
+        "temas": [
+          {
+            "tema_id": "event_loop",
+            "titulo": "Event Loop y Asincronía",
+            "duracion_minutos": 70,
+            "tipo": "video",
+            "url_contenido": "/contenido/node/event-loop.mp4"
+          },
+          {
+            "tema_id": "modulos_npm",
+            "titulo": "Módulos y NPM",
+            "duracion_minutos": 60,
+            "tipo": "video",
+            "url_contenido": "/contenido/node/modulos-npm.mp4"
+          }
+        ]
+      },
+      {
+        "seccion_id": "express_basico",
+        "titulo": "Introducción a Express",
+        "orden": 2,
+        "temas": [
+          {
+            "tema_id": "rutas_middleware",
+            "titulo": "Rutas y Middleware",
+            "duracion_minutos": 80,
+            "tipo": "video",
+            "url_contenido": "/contenido/node/rutas-middleware.mp4"
+          },
+          {
+            "tema_id": "crear_api",
+            "titulo": "Creando una API REST",
+            "duracion_minutos": 100,
+            "tipo": "video",
+            "url_contenido": "/contenido/node/api-rest.mp4"
+          }
+        ]
+      }
+    ]
+  }
+]);

@@ -11,6 +11,31 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from datetime import datetime
 import hashlib
+import pymongo
+import sys
+from flask import abort
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
+from slugify import slugify  # pip install python-slugify
+
+mongo_client = MongoClient('mongodb://localhost:27017/')
+mongo_db = mongo_client['MongoDb']
+
+uri = 'localhost:27017'
+# Conexión optimizada
+try:
+    # Versión con manejo de errores
+    mongo_client = MongoClient('mongodb://localhost:27017/', 
+                             serverSelectionTimeoutMS=5000)  # Timeout de 5 segundos
+    mongo_client.server_info()  # Forza una prueba de conexión
+    mongo_db = mongo_client['MongoDb']  # Nombre de tu base de datos
+    print("✅ Conexión a MongoDB exitosa")
+except ConnectionFailure as e:
+    print(f"❌ Error conectando a MongoDB: {e}")
+    sys.exit(1)
+except Exception as e:
+    print(f"❌ Error inesperado: {e}")
+    sys.exit(1)
 
 # ========================
 # FUNCIONES UTILITARIAS
@@ -158,19 +183,57 @@ def get_all_cursos():
 def get_availables_cursos():
     return Curso.query.filter_by(disponibilidad=True).all()
 
-def insert_curso(nombre, descripcion, duracion, imagen):
-    nuevo = Curso(
+def insert_curso(nombre, descripcion, duracion, imagen_url):
+    # Paso 1: Buscar en MongoDB por nombre para encontrar curso_id existente
+    doc_existente = mongo_db.cursos.find_one({"nombre": nombre})
+    
+    if doc_existente:
+        # Usar el curso_id existente
+        mongo_curso_id = doc_existente["curso_id"]
+    else:
+        # Crear nuevo ID si no existe (usando slug para nombres nuevos)
+        mongo_curso_id = slugify(nombre, separator="_")
+        mongo_db.cursos.insert_one({
+            "curso_id": mongo_curso_id,
+            "nombre": nombre,
+            "descripcion": descripcion,
+            "duracion_total_horas": duracion,
+            "secciones": []
+        })
+
+    # Paso 2: Generar slug único para SQL
+    slug = generar_slug_unico(nombre)  # Usar la función que maneja duplicados
+
+    # Paso 3: Crear curso en SQL
+    nuevo_curso = Curso(
         nombre=nombre,
         descripcion=descripcion,
         duracion=duracion,
-        disponibilidad=True,
-        imagen_url=imagen
+        imagen_url=imagen_url,
+        mongo_curso_id=mongo_curso_id,
+        slug=slug
     )
-    db.session.add(nuevo)
+
+    db.session.add(nuevo_curso)
     db.session.commit()
+    return nuevo_curso
+
+def generar_slug_unico(nombre):
+    base_slug = slugify(nombre)
+    contador = 1
+    nuevo_slug = base_slug
+
+    while Curso.query.filter_by(slug=nuevo_slug).first() is not None:
+        nuevo_slug = f"{base_slug}-{contador}"
+        contador += 1
+
+    return nuevo_slug
 
 def get_curso_by_id(curso_id):
     return Curso.query.get(curso_id)
+
+def get_contenido_mongo_por_curso_id(mongo_id):
+    return mongo_db.cursos.find_one({"curso_id": mongo_id})
 
 def get_cursos_by_usuario(user_id):
     return Curso.query.join(UsuarioCurso).filter(UsuarioCurso.user_id == user_id).all()
@@ -240,6 +303,22 @@ def toggle_curso_status(curso_id, disponible):
         print(f"Error al actualizar curso {curso_id}: {e}")
         return False
 
+
+def get_curso_content(curso_slug):
+    # 1. Obtener el curso de SQL para sacar la referencia a MongoDB
+    curso = Curso.query.filter_by(slug=curso_slug).first()
+    if not curso:
+        abort(404)
+    
+    # 2. Obtener contenido de MongoDB
+    contenido = mongo_db.cursos.find_one({"curso_id": curso.mongo_curso_id})
+    if not contenido:
+        abort(404)
+    
+    return {
+        "curso": curso,
+        "contenido": contenido
+    }
 
 # ========================
 # INSCRIPCIONES

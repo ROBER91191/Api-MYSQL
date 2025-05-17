@@ -7,7 +7,7 @@
   <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for curso in cursos %}
     <div class="col">
-      <div class="card h-100">
+      <a href="{{ url_for('detalle_curso', curso_slug=curso.slug) }}" class="card-link">
         <img src="{{ curso.imagen_url or 'https://via.placeholder.com/300x150?text=Curso' }}" class="card-img-top" alt="Imagen Curso">
         <div class="card-body">
           <h5 class="card-title">{{ curso[1] }}</h5>
@@ -28,7 +28,7 @@
             {% endif %}
           </li>
         </div>
-      </div>
+      </a>
     </div>
 
     {% endfor %}
@@ -37,4 +37,16 @@
   <p class="text-muted">Aún no te has inscrito en ningún curso.</p>
   {% endif %}
 </div>
+
+<style>
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  .hover-effect:hover {
+    transform: translateY(-5px);
+    transition: transform 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+</style>
 {% endblock %}

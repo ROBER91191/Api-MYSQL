@@ -399,8 +399,12 @@ def agregar_curso():
         imagen.save(ruta)
         imagen_url = f"/static/uploads/{filename}"
 
-    db.insert_curso(nombre, descripcion, duracion,imagen_url)
-    flash("Curso agregado con éxito ✅", "success")
+    try:
+        db.insert_curso(nombre, descripcion, duracion, imagen_url)
+        flash("Curso agregado con éxito ✅", "success")
+    except Exception as e:
+        flash(f"Error al crear curso: {str(e)}", "danger")
+    
     return redirect(url_for("admin"))
 
 
@@ -567,3 +571,11 @@ def editar_curso(curso_id):
 
     # Mostrar formulario de edición
     return render_template("editar_curso.html", curso=curso, active_tab="cursos")
+
+
+@app.route('/curso/<string:curso_slug>')
+def detalle_curso(curso_slug):
+    datos = db.get_curso_content(curso_slug)
+    return render_template('detalle_curso.html', 
+                         curso=datos["curso"],
+                         contenido=datos["contenido"])

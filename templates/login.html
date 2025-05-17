@@ -6,9 +6,9 @@
 {% endblock %}
 {% block content %}
     <div>
-{% if rerror %}
+<!-- {% if rerror %}
     <div class="alert alert-warning" role="alert">{{rerror_msg}}</div>
-{% endif %}
+{% endif %} -->
     </div>
     <form class="form" method="post" class="mxw-800">
     <div class="form-group mt-3">
@@ -23,6 +23,12 @@
     </div>
     <input type="submit" class="btn btn-dark mt-4" value="Login">
     </form>
+
+    {% if rerror %}
+        <div class="alert alert-danger">
+        {{ rerror_msg }}
+        </div>
+    {% endif %}
 {% endblock %}
 {% block footer %}
 {% endblock %}

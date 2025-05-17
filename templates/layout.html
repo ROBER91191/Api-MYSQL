@@ -52,7 +52,7 @@
             {{ session['usuario_nombre'] or 'Mi Perfil' }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="{{ url_for('edit_user') }}">🧾 Perfil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('edit_my_user') }}">🧾 Perfil</a></li>
             <li><a class="dropdown-item" href="{{ url_for('mis_cursos') }}">🎓 Mis Cursos</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">🔓 Cerrar Sesión</a></li>

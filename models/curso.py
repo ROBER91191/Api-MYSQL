@@ -6,5 +6,5 @@ class Curso(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.Text)
     duracion = db.Column(db.Integer)
-    disponibilidad = db.Column(db.Boolean, default=True)
+    disponibilidad = db.Column(db.Boolean, default=True, server_default='1')
     imagen_url = db.Column(db.Text)

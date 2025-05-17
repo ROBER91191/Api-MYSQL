@@ -130,6 +130,16 @@ def login():
             if db.check_userbymail(val_email):
                 ###adding code
                 loged_user = db.check_userbymail(val_email)
+
+                # Verificar si el usuario está habilitado (nuevo check)
+                if not loged_user.habilitado:
+                    return render_template("login.html", 
+                                        show_data_aftersend=True, 
+                                        rerror=True,
+                                        rerror_msg="Usuario deshabilitado. Contacte al administrador.",
+                                        email=email, 
+                                        passw=passw)
+                
                 # comprobar coincidencia de passw
                 if db.hash_password(val_passw) == loged_user.password:
                     # OK
@@ -231,29 +241,62 @@ def all_users():
     return render_template("all_users.html", users=users, current_user=current_user)
 
 
-@app.route("/userdata/toggle/<int:id>/<int:new_status>")
-def toggle_user(id, new_status):
+@app.route("/curso/toggle/<int:curso_id>", methods=["POST"])
+def toggle_curso(curso_id):
+    # Verificación de cookie y permisos (igual que antes)
     cookie = request.cookies.get("usu")
     if not cookie:
         return redirect(url_for("login"))
+    
     try:
         user_id = int(cookie.split("_")[0])
     except:
         return redirect(url_for("login"))
+    
     current_user = db.get_user_by_id(user_id)
-    if not current_user or current_user[6] != 1:  # solo super
+    if not current_user or current_user.id_rol != 1:  # solo super
         return redirect(url_for("home"))
-    db.toggle_user_status(id, new_status)
-    return redirect(url_for("all_users"))
+    
+    # Obtener el nuevo estado del formulario
+    disponible = int(request.form.get("nuevo_estado", 0))
+    # disponible = bool(nuevo_estado)
+    
+    # Actualizar en la base de datos
+    db.toggle_curso_status(curso_id, disponible)
+    
+    return redirect(url_for("admin", active_tab='cursos'))
 
+@app.route("/user/toggle/<int:target_user_id>", methods=["POST"])
+def toggle_user(target_user_id):  # Cambié el nombre del parámetro para claridad
+    # Verificación de cookie y permisos
+    cookie = request.cookies.get("usu")
+    if not cookie:
+        return redirect(url_for("login"))
+    
+    try:
+        logged_user_id = int(cookie.split("_")[0])  # ID del usuario logueado
+    except:
+        return redirect(url_for("login"))
+    
+    current_user = db.get_user_by_id(logged_user_id)
+    if not current_user or current_user.id_rol != 1:  # solo super
+        return redirect(url_for("home"))
+    
+    # Usamos target_user_id (de la URL) en lugar del usuario logueado
+    nuevo_estado = int(request.form.get("nuevo_estado", 0))
+    
+    # Actualizar el usuario TARGET (no el logueado)
+    db.toggle_user_status(target_user_id, bool(nuevo_estado))
+    
+    return redirect(url_for("admin", active_tab='usuarios'))  # Corregí 'user' a 'usuarios'
 
 @app.route("/logout")
 def logout():
     # Elimina cualquier dato de sesión o cookie
     session.clear()
-
+    cursos = db.get_all_cursos()
     # Elimina cookie personalizada si la estás usando
-    resp = make_response(render_template("home.html"))
+    resp = make_response(render_template("home.html", cursos=cursos))
     resp.set_cookie("usu", "", expires=0)
 
     return resp
@@ -269,7 +312,7 @@ def inject_user_cookie():
 @app.route("/cursos")
 def mostrar_cursos():
     usuario_id = db.get_usuario_id_desde_cookie()
-    cursos = db.get_all_cursos()
+    cursos = db.get_availables_cursos()
     cursos_inscritos = db.get_cursos_ids_by_usuario(usuario_id)
     return render_template("cursos.html", cursos=cursos, cursos_inscritos=cursos_inscritos)
 
@@ -395,7 +438,7 @@ def borrar_curso(curso_id):
 
 
 @app.route("/userdata/edit", methods=["GET", "POST"])
-def edit_user():
+def edit_my_user():
     usuario_id = db.get_usuario_id_desde_cookie()
     user = db.get_usuario_by_id(usuario_id)
 
@@ -416,7 +459,7 @@ def edit_user():
             session['usuario_imagen'] = updated_user.imagen_url
 
         flash("Datos actualizados correctamente", "success")
-        return redirect(url_for("edit_user"))
+        return redirect(url_for("edit_my_user"))
 
     return render_template("editar_usuario.html", user=user,active_tab='Usuarios')
 

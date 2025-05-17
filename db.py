@@ -62,11 +62,19 @@ def get_all_users():
 def get_users_by_email_filter(email):
     return Usuario.query.filter(Usuario.email.like(f"%{email}%")).all()
 
-def toggle_user_status(user_id, new_status):
-    usuario = Usuario.query.get(user_id)
-    if usuario:
-        usuario.habilitado = bool(new_status)
+def toggle_user_status(user_id, habilitado):
+    user = Usuario.query.get(user_id)
+    if not user:
+        return False
+    
+    user.habilitado = habilitado
+    try:
         db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al actualizar curso {user}: {e}")
+        return False
 
 def get_usuario_id_desde_cookie():
     from flask import request
@@ -145,8 +153,10 @@ def get_all_usuarios_with_roles():
 # ========================
 
 def get_all_cursos():
-    return Curso.query.filter_by(disponibilidad=True).all()
+    return Curso.query.all()
 
+def get_availables_cursos():
+    return Curso.query.filter_by(disponibilidad=True).all()
 
 def insert_curso(nombre, descripcion, duracion, imagen):
     nuevo = Curso(
@@ -214,6 +224,21 @@ def delete_curso(curso_id):
     if curso:
         db.session.delete(curso)
         db.session.commit()
+
+# Para cambiar disponibilidad
+def toggle_curso_status(curso_id, disponible):
+    curso = Curso.query.get(curso_id)
+    if not curso:
+        return False
+    
+    curso.disponibilidad = disponible
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al actualizar curso {curso_id}: {e}")
+        return False
 
 
 # ========================

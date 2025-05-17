@@ -51,11 +51,15 @@
       <ul class="list-group">
         {% for user in usuarios %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="form-check form-switch me-3">
+          <!-- En admin.html - Cambia el formulario -->
+          <form method="POST" action="{{ url_for('toggle_user', target_user_id=user.id) }}" class="d-inline">
+            <input type="hidden" name="nuevo_estado" value="{{ 0 if user.habilitado else 1 }}">
+            <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" 
-                    id="user-{{ user.id }}" {% if user.habilitado %}checked{% endif %}
-                    onchange="toggleHabilitado('{{ user.id }}', 'usuario')">  <!-- Comillas simples alrededor de user.id -->
+                    {% if user.habilitado %}checked{% endif %}
+                    onchange="this.form.submit()">
             </div>
+          </form>
           {{ user.nombre }} {{ user.apellido }} ({{ user.email }}) - Rol: {{ user.rol_nombre }}
           
           <div class="d-flex gap-2">
@@ -139,11 +143,15 @@
       <ul class="list-group">
         {% for curso in cursos %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div class="form-check form-switch me-3">
-          <input class="form-check-input" type="checkbox" role="switch" 
-                id="curso-{{ curso.id }}" {% if curso.disponible %}checked{% endif %}
-                onchange="toggleHabilitado('{{ curso.id }}', 'curso')">
-        </div>
+          <form method="POST" action="{{ url_for('toggle_curso', curso_id=curso.id) }}" class="d-inline">
+            <div class="form-check form-switch">
+              <input type="hidden" name="nuevo_estado" value="{{ 0 if curso.disponibilidad else 1 }}">
+              <input class="form-check-input" type="checkbox" role="switch" 
+                    id="curso-{{ curso.id }}" 
+                    {% if curso.disponibilidad %}checked{% endif %}
+                    onchange="this.form.submit()">
+            </div>
+          </form>
           {{ curso.nombre }} - {{ curso.duracion }}
           <div class="d-flex gap-2">
             {% if session.get('role') == 'super' %}

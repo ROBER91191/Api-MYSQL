@@ -15,9 +15,18 @@
           <p><strong>Duración:</strong> {{ curso[3] }} horas</p>
 
           <form method="POST" action="{{ url_for('abandonar_curso', curso_id=curso.id) }}">
-            <button type="submit" class="btn btn-danger btn-sm">Abandonar</button>
+             <button type="submit" 
+                  class="btn btn-danger btn-sm"
+                  {% if curso.disponibilidad == 0 %}disabled{% endif %}>
+            Abandonar
+          </button>
           </form>
-
+          <li class="list-group-item">
+            {{ curso.nombre }}
+            {% if not curso.diponibilidad ==0 %}
+              <small class="text-muted">(No disponible temporalmente)</small>
+            {% endif %}
+          </li>
         </div>
       </div>
     </div>

@@ -2,51 +2,36 @@
 {% block content %}
 <div class="container mt-5 mb-5">
   <h2 class="mb-4">Mis Cursos</h2>
-
   {% if cursos %}
-  <div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="row">
     {% for curso in cursos %}
-    <div class="col">
-      <a href="{{ url_for('detalle_curso', curso_slug=curso.slug) }}" class="card-link">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 bg-dark border-0 shadow-sm">
         <img src="{{ curso.imagen_url or 'https://via.placeholder.com/300x150?text=Curso' }}" class="card-img-top" alt="Imagen Curso">
-        <div class="card-body">
-          <h5 class="card-title">{{ curso[1] }}</h5>
-          <p class="card-text">{{ curso[2] }}</p>
-          <p><strong>Duración:</strong> {{ curso[3] }} horas</p>
-
-          <form method="POST" action="{{ url_for('abandonar_curso', curso_id=curso.id) }}">
-             <button type="submit" 
-                  class="btn btn-danger btn-sm"
-                  {% if curso.disponibilidad == 0 %}disabled{% endif %}>
-            Abandonar
-          </button>
-          </form>
-          <li class="list-group-item">
-            {{ curso.nombre }}
-            {% if not curso.diponibilidad ==0 %}
-              <small class="text-muted">(No disponible temporalmente)</small>
+        <h5 class="text-center mt-3 mb-0" style="color: #fff;"><strong>{{ curso.nombre }}</strong></h5>
+        <div class="card-body d-flex flex-column p-3 pt-2">
+          <div class="mt-auto">
+            <p class="card-text mb-2 text-center"><strong>Duración:</strong> {{ curso.duracion }} horas</p>
+            <form method="POST" action="{{ url_for('abandonar_curso', curso_id=curso.id) }}">
+              <button type="submit" class="btn btn-danger btn-sm w-100"
+                {% if curso.disponibilidad == 0 %}disabled{% endif %}>
+                Abandonar
+              </button>
+            </form>
+            {% if curso.disponibilidad == 0 %}
+            <p class="text-muted text-center mb-0 mt-2"><small>(No disponible temporalmente)</small></p>
             {% endif %}
-          </li>
+            <a href="{{ url_for('detalle_curso', curso_slug=curso.slug) }}" class="btn btn-primary btn-sm w-100 mt-2">
+              Ver detalles
+            </a>
+          </div>
         </div>
-      </a>
+      </div>
     </div>
-
     {% endfor %}
   </div>
   {% else %}
   <p class="text-muted">Aún no te has inscrito en ningún curso.</p>
   {% endif %}
 </div>
-
-<style>
-  .card-link {
-    text-decoration: none;
-    color: inherit;
-  }
-  .hover-effect:hover {
-    transform: translateY(-5px);
-    transition: transform 0.2s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  }
-</style>
 {% endblock %}

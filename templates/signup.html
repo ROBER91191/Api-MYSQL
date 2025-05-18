@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div>
+<div class="container mt-4 mb-5">
     {% if rerror %}
     <div class="alert alert-warning" role="alert">{{rerror_msg}}</div>
     {% endif %}
@@ -31,7 +31,7 @@
                    {% if show_data_aftersend %} value="{{ email }}" {% endif %}>
         </div>
     
-        <div class="form-group mt-3 w-50">
+        <div class="form-group mt-3">
             <label for="passw" class="form-label">Contraseña</label>
             <input type="password" name="passw" id="passw" class="form-control" placeholder="Contraseña" required
                    {% if show_data_aftersend %} value="{{ passw }}" {% endif %}>

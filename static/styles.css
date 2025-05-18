@@ -249,3 +249,8 @@ footer {
     white-space: nowrap;      /* evita saltos de línea dentro del texto */
   }
 }
+/* Tamaño toggle */
+.form-check-input[type="checkbox"][role="switch"] {
+  width: 3em;
+  height: 1.5em;
+}

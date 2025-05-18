@@ -7,7 +7,7 @@
   <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for curso in cursos %}
     <div class="col">
-      <a href="{{ url_for('detalle_curso', curso_slug=curso.curso_id) }}" class="card-link">
+      <a href="{{ url_for('detalle_curso', curso_slug=curso.slug) }}" class="card-link">
         <img src="{{ curso.imagen_url or 'https://via.placeholder.com/300x150?text=Curso' }}" class="card-img-top" alt="Imagen Curso">
         <div class="card-body">
           <h5 class="card-title">{{ curso[1] }}</h5>

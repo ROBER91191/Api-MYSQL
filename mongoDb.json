@@ -1,4 +1,4 @@
-db.cursos.insertMany([
+[
   {
     "curso_id": "java_para_principiantes",
     "nombre": "Java para Principiantes",

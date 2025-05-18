@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-  <div class="row">
+<div class="container-fluid mt-5 px-0 bg-bootstrap-dark">
+  <div class="row gx-2">
     <!-- Sidebar -->
-    <aside class="col-md-3 mb-4">
-      <div class="card shadow-sm sticky-top">
+    <aside class="col-md-3 mb-4" style="padding-left: 0;">
+      <div class="card shadow-sm sticky-top bg-dark text-white">
         {% if curso.imagen_url %}
         <img src="{{ curso.imagen_url }}" class="card-img-top rounded-top" alt="Imagen del curso {{ curso.nombre }}">
         {% endif %}
@@ -15,12 +15,12 @@
           <hr>
           <div class="list-group list-group-flush">
             {% for seccion in contenido.secciones %}
-            <a href="#seccion-{{ seccion.seccion_id }}" class="list-group-item list-group-item-action">
+            <a href="#seccion-{{ seccion.seccion_id }}" class="list-group-item list-group-item-action bg-dark text-white">
               {{ seccion.titulo }}
             </a>
             {% endfor %}
           </div>
-          <a href="{{ url_for('mis_cursos') }}" class="btn btn-dark mt-4 w-100">
+          <a href="{{ url_for('mis_cursos') }}" class="btn btn-primary mt-4 w-100">
             <i class="fas fa-arrow-left"></i> Volver a mis cursos
           </a>
         </div>
@@ -28,14 +28,14 @@
     </aside>
 
     <!-- Contenido principal -->
-    <section class="col-md-9">
+    <section class="col-md-9 bg-bootstrap-dark text-white" style="padding-left: 2rem;">
       {% for seccion in contenido.secciones %}
       <div id="seccion-{{ seccion.seccion_id }}" class="mb-5">
         <h2 class="mb-4 border-bottom pb-2">{{ seccion.titulo }}</h2>
         <div class="row">
         {% for tema in seccion.temas %}
           <div class="col-12 mb-3">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm bg-dark text-white">
               <div class="card-body">
                 <h5 class="card-title">{{ tema.titulo }}</h5>
                 <div class="d-flex justify-content-between mb-3">
@@ -50,8 +50,8 @@
                   </video>
                 </div>
                 {% else %}
-                <div class="p-3 bg-light rounded">
-                  <a href="{{ tema.url_contenido }}" class="btn btn-dark" target="_blank">
+                <div class="p-3 bg-light rounded bg-dark text-white">
+                  <a href="{{ tema.url_contenido }}" class="btn btn-primary" target="_blank">
                     <i class="fas fa-file-pdf"></i> Ver material
                   </a>
                 </div>

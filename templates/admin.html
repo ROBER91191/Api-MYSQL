@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-3">
   <h2>Panel de Administración</h2>
 
   <ul class="nav nav-tabs" id="adminTabs" role="tablist">
@@ -64,20 +64,23 @@
           
           <div class="d-flex gap-2">
             {% if session.get('role') == 'super' %}
-            <!-- Botón de edición -->
-            <a href="{{ url_for('editar_usuario', usuario_id=user.id) }}" 
-              class="btn btn-sm btn-primary" 
-              data-bs-toggle="tooltip" 
-              title="Editar usuario">
-              ✏️
-            </a>
+              <!-- Botón de edición -->
+              <a href="{{ url_for('editar_usuario', usuario_id=user.id) }}" 
+                class="btn btn-sm btn-primary d-flex align-items-center justify-content-center" 
+                style="min-width: 2.5rem; min-height: 2.5rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; padding: 0;" 
+                data-bs-toggle="tooltip" 
+                title="Editar usuario">
+                <span>✏️</span>
+              </a>
             {% endif %}
 
             <!-- Botón de eliminar -->
-            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ user.id }}"
-            ata-bs-toggle="tooltip" 
-              title="Eiminar usuario">
-              🗑
+            <button class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
+                style="min-width: 2.5rem; min-height: 2.5rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; padding: 0;"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmarEliminar{{ user.id }}"
+                title="Eliminar usuario">
+              <span>🗑</span>
             </button>
           </div>
 
@@ -156,19 +159,22 @@
           <div class="d-flex gap-2">
             {% if session.get('role') == 'super' %}
             <!-- Botón de edición -->
-            <a href="{{ url_for('editar_curso', curso_id=curso.id) }}" 
-              class="btn btn-sm btn-primary" 
-              data-bs-toggle="tooltip" 
+            <a href="{{ url_for('editar_curso', curso_id=curso.id) }}"
+              class="btn btn-sm btn-primary d-flex align-items-center justify-content-center"
+              style="min-width: 2.5rem; min-height: 2.5rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; padding: 0;"
+              data-bs-toggle="tooltip"
               title="Editar curso">
-              ✏️
+              <span>✏️</span>
             </a>
             {% endif %}
 
             <!-- Botón de eliminar -->
-            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ curso.id }}"
-            ata-bs-toggle="tooltip" 
-              title="Eiminar curso">
-              🗑
+            <button class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
+              style="min-width: 2.5rem; min-height: 2.5rem; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; padding: 0;"
+              data-bs-toggle="modal"
+              data-bs-target="#confirmarEliminar{{ curso.id }}"
+              title="Eliminar curso">
+              <span>🗑</span>
             </button>
           </div>
 

@@ -139,6 +139,17 @@ nav .nav-link:hover {
   display: flex;
   flex-direction: column;
 }
+
+h5.card-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: #c5c1c1 !important;
+  font-weight: bold;
+  text-align: center;       
+  width: 100%;
+  display: block;
+}
+
 .card-title {
   margin-bottom: 0.5rem;
   font-size: 1.25rem;

@@ -181,7 +181,7 @@ def get_all_cursos():
     return Curso.query.all()
 
 def get_availables_cursos():
-    return Curso.query.filter_by(disponibilidad=True).all()
+    return Curso.query.filter_by(disponibilidad=1).all()
 
 def insert_curso(nombre, descripcion, duracion, imagen_url):
     # Paso 1: Buscar en MongoDB por nombre para encontrar curso_id existente

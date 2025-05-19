@@ -311,7 +311,7 @@ def get_curso_content(curso_slug):
         abort(404)
     
     # 2. Obtener contenido de MongoDB
-    contenido = mongo_db.cursos.find_one({"curso_id": curso.mongo_curso_id})
+    contenido = mongo_db.cursos.find_one({"curso_id": curso.slug})
     if not contenido:
         abort(404)
     

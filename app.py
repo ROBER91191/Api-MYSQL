@@ -254,7 +254,7 @@ def toggle_curso(curso_id):
         return redirect(url_for("login"))
     
     current_user = db.get_user_by_id(user_id)
-    if not current_user or current_user.id_rol != 1:  # solo super
+    if not current_user or current_user.id_rol not in [1, 2]:  # super y admin
         return redirect(url_for("home"))
     
     # Obtener el nuevo estado del formulario

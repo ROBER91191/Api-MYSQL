@@ -205,4 +205,25 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Guardar la pestaña seleccionada en localStorage
+    const adminTabs = document.getElementById('adminTabs');
+    adminTabs.addEventListener('click', (e) => {
+      if (e.target.classList.contains('nav-link')) {
+        localStorage.setItem('lastActiveTab', e.target.getAttribute('data-bs-target'));
+      }
+    });
+
+    // Recuperar la última pestaña activa (si existe)
+    const lastActiveTab = localStorage.getItem('lastActiveTab');
+    if (lastActiveTab) {
+      const tabToActivate = document.querySelector(`[data-bs-target="${lastActiveTab}"]`);
+      if (tabToActivate) {
+        new bootstrap.Tab(tabToActivate).show();
+      }
+    }
+  });
+</script>
 {% endblock %}

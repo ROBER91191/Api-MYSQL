@@ -13,3 +13,4 @@ class Usuario(db.Model):
     tipo=db.Column(db.String(50))
     habilitado = db.Column(db.Boolean, default=True)
     imagen_url = db.Column(db.String(255))
+    sesiones = db.relationship('UserSession', backref='usuario', cascade='all, delete-orphan')

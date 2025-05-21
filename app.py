@@ -63,10 +63,10 @@ def signup():
                     # nombre = new_user[3][:1]
                     # apellido = new_user[4][:1]
                     cookie_str = str(new_user.id) + "_" + new_user.nombre +new_user.apellido
-                    resp = make_response(redirect(url_for('userdata',
-                    id=new_user.id)))
-                    resp.set_cookie("usu", cookie_str, max_age=60*5)
-                    #60*60*24
+                    resp = make_response(redirect(url_for('mostrar_cursos')))
+                    resp.set_cookie("usu", cookie_str, max_age=600*5)
+                    session['role'] = db.get_rol_name_by_id(new_user.id_rol)
+                    
                     return resp
                 #logar y redirigir a destino
                 else:
@@ -160,7 +160,7 @@ def login():
                     resp = make_response(redirect(url_for('mostrar_cursos')))
 
                     # Guardamos la cookie "usu", válida por 5 minutos (300 segundos)
-                    resp.set_cookie("usu", cookie_str, max_age=60*5)
+                    resp.set_cookie("usu", cookie_str, max_age=600*5)
                     session['usuario_nombre'] = loged_user.nombre
                     return resp
                 else:
